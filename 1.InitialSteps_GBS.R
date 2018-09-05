@@ -34,15 +34,18 @@ hapgeno.orig <- as.matrix(hap.orig[,12:ncol(hap.orig)])
 # print out hapgeno.orig colnames to see populations
 sort(colnames(hapgeno.orig))
 
-# separate out the populations
-h3 <- hapgeno.orig[, grep(paste(c('CN_', 'Carol', 'Newton'), collapse = '|'), colnames(hapgeno.orig))]
-h5 <- hapgeno.orig[, grep(paste(c('EN_', 'Erin', 'Newton'), collapse = '|'), colnames(hapgeno.orig))]
-h6 <- hapgeno.orig[, grep(paste(c('FN_', 'Flynn', 'Newton'), collapse = '|'), colnames(hapgeno.orig))]
-h10 <- hapgeno.orig[, grep(paste(c('JN_', 'Joy', 'Newton'), collapse = '|'), colnames(hapgeno.orig))]
-h12 <- hapgeno.orig[, grep(paste(c('LN_', 'Lola', 'Newton'), collapse = '|'), colnames(hapgeno.orig))]
-h13.newton <- hapgeno.orig[, grep(paste(c('MN_', 'Molly', 'Newton'), collapse = '|'), colnames(hapgeno.orig))]
-h13.overley <- hapgeno.orig[, grep(paste(c('MO_', 'Molly', 'Overley'), collapse = '|'), colnames(hapgeno.orig))]
-h26 <- hapgeno.orig[, grep(paste(c('KO_', 'KU2147', 'Overley'), collapse = '|'), colnames(hapgeno.orig))]
-h32 <- hapgeno.orig[, grep(paste(c('SynOp', 'SyntheticW7984', 'OpataM85'), collapse = '|'), colnames(hapgeno.orig))]
+# function to parse out populations
+parse_pop <- function(id=NULL, r.parent=NULL, s.parent=NULL) {
+  return(hapgeno.orig[, grep(paste(c(id, r.parent, s.parent), collapse = '|'), colnames(hapgeno.orig))])
+}
 
-#####################
+# separate out the populations
+h3 <- parse_pop('CN_', 'Carol', 'Newton')
+h5 <- parse_pop('EN_', 'Erin', 'Newton')
+h6 <- parse_pop('FN_', 'Flynn', 'Newton')
+h10 <- parse_pop('JN_', 'Joy', 'Newton')
+h12 <- parse_pop('LN_', 'Lola', 'Newton')
+h13.newton <- parse_pop('MN_', 'Molly', 'Newton')
+h13.overley <- parse_pop('MO_', 'Molly', 'Overley')
+h26 <- parse_pop('KO_', 'KU2147', 'Overley')
+h32 <- parse_pop('SynOp', 'SyntheticW7984', 'OpataM85')
