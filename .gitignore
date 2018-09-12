@@ -1,5 +1,6 @@
 data/
 log.txt
+output/
 
 .Rproj.user
 .Rhistory
