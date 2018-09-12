@@ -4,7 +4,7 @@
 ## ###########################
 
 # load required packages
-library(pacman)
+if(!require(pacman)) install.packages(pacman); require(pacman)
 p_load(data.table)
 
 # read hapfile
