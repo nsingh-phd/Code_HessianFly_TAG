@@ -5,7 +5,7 @@ alpha=0.001
 maf=0.3
 miss=0.2
 
-hapgeno <- erin
+hapgeno <- h5
 
 res.parent <- 'Erin'
 sus.parent <- 'Newton'
@@ -110,9 +110,9 @@ f.test <- f.test[complete.cases(f.test), ]
 allchr_bwa=cbind(as.data.frame(f.test),NA,NA)
 allchr_bwa=allchr_bwa[grep('UN', allchr_bwa[,1], invert = T),]
 colnames(allchr_bwa)=c('SNP', 'P', 'CHR', 'BP', 'CHRHomoeo')
-allchr_bwa$BP=as.integer(gsub('(.+_.+)_(\\d+)', '\\2', allchr_bwa$SNP))
-allchr_bwa$CHR=gsub('(.+_.+)_(\\d+)', '\\1', allchr_bwa$SNP)
-allchr_bwa$CHR=substr(allchr_bwa$CHR, 4,5)
+allchr_bwa$BP=as.integer(gsub('(.+)_(\\d+)', '\\2', allchr_bwa$SNP))
+allchr_bwa$CHR=gsub('(.+)_(\\d+)', '\\1', allchr_bwa$SNP)
+allchr_bwa$CHR=substr(allchr_bwa$CHR, 2,3)
 allchr_bwa$CHRHomoeo=allchr_bwa$CHR
 allchr_bwa$P=as.numeric(as.character(allchr_bwa$P))
 
@@ -138,7 +138,7 @@ cat('P-value range:', range(allchr_bwa$P))
 cat('Number of significant SNPs:', sum(allchr_bwa$P < alpha/nrow(allchr_bwa)))
 
 ## plot
-library(qqman)
+p_load(qqman)
 qq(allchr_bwa$P)
 
 pdf('EN_genomewide.pdf', height = 6.5, width = 11)
