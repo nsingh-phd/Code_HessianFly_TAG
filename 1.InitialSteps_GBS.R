@@ -4,51 +4,54 @@
 ## ###########################
 
 # load required packages
-if(!require(pacman)) install.packages(pacman); require(pacman)
-p_load(data.table)
+  if(!require(pacman)) install.packages(pacman); require(pacman)
+  p_load(data.table)
 
 # read hapfile
-hap.orig <- fread("data/HessianFly_TAG.hmp.txt", header = T, check.names = F, data.table = F)
+  hap.orig <- fread("data/HessianFly_TAG.hmp.txt", header = T, check.names = F, stringsAsFactors = F, data.table = F)
 # check column names
-colnames(hap.orig)
+  colnames(hap.orig)
 # utilize extra columns
-colnames(hap.orig)[5:11] <- c('alleleA', 'alleleB', 'het', 'het_prop', 'missing', 'propmiss', 'maf')
+  colnames(hap.orig)[5:11] <- c('alleleA', 'alleleB', 'het', 'het_prop', 'missing', 'propmiss', 'maf')
 
 # check blank wells to see if they are blank or not
 # excessive counts of snp call data meaning that they are not blank
-colSums(hap.orig[, grep('blank', colnames(hap.orig), ignore.case = T)] != 'N')
+  colSums(hap.orig[, grep('blank', colnames(hap.orig), ignore.case = T)] != 'N')
 
 # remove unanchored snps and blank sample wells
-hap.orig <- hap.orig[(grep('UN', hap.orig$`rs#`, ignore.case = T, invert = T)),
-                     (grep('BLANK', colnames(hap.orig), ignore.case = T, invert = T))]
-colnames(hap.orig) # check column names
+  hap.orig <- hap.orig[(grep('UN', hap.orig$`rs#`, ignore.case = T, invert = T)),
+                       (grep('BLANK', colnames(hap.orig), ignore.case = T, invert = T))]
+# check column names
+  colnames(hap.orig)
 
-# subset of hapfile to convert IUPAC hets to H
-hapgeno.orig <- as.matrix(hap.orig[,12:ncol(hap.orig)])
+# subset of hapfile to convert IUPAC hets to H (convert to matrix for faster computation)
+  hapgeno.orig <- as.matrix(hap.orig[,12:ncol(hap.orig)])
   # check unique allelic calls
-  sort(unique(c(hapgeno.orig)))
-  
-  hapgeno.orig[hapgeno.orig %in% c('N', '0', '+', '-')] = NA
-  hapgeno.orig[hapgeno.orig %in% c('K', 'M', 'R', 'S', 'W', 'Y')] = 'H'
-  
-  sort(unique(c(hapgeno.orig)))
-  hapgeno.orig <- data.frame(hapgeno.orig, stringsAsFactors = F, check.names = F)
+    sort(unique(c(hapgeno.orig)))
+  # replace missing and other ambiguous calls with NA
+  # replace all het IUPAC codes to H
+    hapgeno.orig[hapgeno.orig %in% c('N', '0', '+', '-')] = NA
+    hapgeno.orig[hapgeno.orig %in% c('K', 'M', 'R', 'S', 'W', 'Y')] = 'H'
+  # check again if conversion done properly
+    sort(unique(c(hapgeno.orig)))
+  # convert back to data frame
+    hapgeno.orig <- data.frame(hapgeno.orig, stringsAsFactors = F, check.names = F)
 
 # print out hapgeno.orig colnames to see populations
-sort(colnames(hapgeno.orig))
+  sort(colnames(hapgeno.orig))
 
 # function to parse out populations
-parse_pop <- function(id=NULL, r.parent=NULL, s.parent=NULL) {
-  return(hapgeno.orig[, grep(paste(c(id, r.parent, s.parent), collapse = '|'), colnames(hapgeno.orig))])
-}
+  parse_pop <- function(id=NULL, r.parent=NULL, s.parent=NULL) {
+    return(hapgeno.orig[, grep(paste(c(id, r.parent, s.parent), collapse = '|'), colnames(hapgeno.orig))])
+  }
 
 # separate out the populations
-h3 <- parse_pop('CN_', 'Carol', 'Newton')
-h5 <- parse_pop('EN_', 'Erin', 'Newton')
-h6 <- parse_pop('FN_', 'Flynn', 'Newton')
-h10 <- parse_pop('JN_', 'Joy', 'Newton')
-h12 <- parse_pop('LN_', 'Lola', 'Newton')
-h13.newton <- parse_pop('MN_', 'Molly', 'Newton')
-h13.overley <- parse_pop('MO_', 'Molly', 'Overley')
-h26 <- parse_pop('KO_', 'KU2147', 'Overley')
-h32 <- parse_pop('SynOp', 'SyntheticW7984', 'OpataM85')
+  h3 <- parse_pop('CN_', 'Carol', 'Newton')
+  h5 <- parse_pop('EN_', 'Erin', 'Newton')
+  h6 <- parse_pop('FN_', 'Flynn', 'Newton')
+  h10 <- parse_pop('JN_', 'Joy', 'Newton')
+  h12 <- parse_pop('LN_', 'Lola', 'Newton')
+  h13.newton <- parse_pop('MN_', 'Molly', 'Newton')
+  h13.overley <- parse_pop('MO_', 'Molly', 'Overley')
+  h26 <- parse_pop('KO_', 'KU2147', 'Overley')
+  h32 <- parse_pop('SynOp', 'SyntheticW7984', 'OpataM85')
