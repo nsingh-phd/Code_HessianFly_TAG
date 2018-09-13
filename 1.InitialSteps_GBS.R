@@ -9,7 +9,10 @@ p_load(data.table)
 
 # read hapfile
 hap.orig <- fread("data/HessianFly_TAG.hmp.txt", header = T, check.names = F, data.table = F)
-colnames(hap.orig) # check column names
+# check column names
+colnames(hap.orig)
+# utilize extra columns
+colnames(hap.orig)[5:11] <- c('alleleA', 'alleleB', 'het', 'het_prop', 'missing', 'propmiss', 'maf')
 
 # check blank wells to see if they are blank or not
 # excessive counts of snp call data meaning that they are not blank
