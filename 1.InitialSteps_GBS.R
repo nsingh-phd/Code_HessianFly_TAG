@@ -3,7 +3,8 @@
 ## Author - Narinder Singh
 ## ###########################
 
-# load required packages
+# load required functions and packages
+  source("functions.R")
   if(!require(pacman)) install.packages(pacman); require(pacman)
   p_load(data.table)
 
