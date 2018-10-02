@@ -4,12 +4,10 @@
 ## Mapping with GBS SNP calls
 ## ###########################
 
-# load required functions, files, and packages
+# load required functions and files
   chrom.info <- read.table('data/chrom_info.txt', header = T, as.is = T)
   source("functions.R")
-  if(!require(pacman)) install.packages(pacman); require(pacman)
-  p_load(data.table, qqman)
-
+  
 # read hapfile
   hap.orig <- fread("data/HessianFly_TAG.hmp.txt", header = T, check.names = F, stringsAsFactors = F, data.table = F)
 # check column names
@@ -80,39 +78,39 @@
 ## ##################
 
   # Carol x Newton - H3
-  associationTest(dat = h3, res.parent = 'Carol', sus.parent = 'Newton')
+  associationTest_GBS(dat = h3, res.parent = 'Carol', sus.parent = 'Newton')
   # est.introgression(dat = , chrom = '')
   
   # Erin x Newton - H5
-  associationTest(dat = h5, res.parent = 'Erin', sus.parent = 'Newton')
+  associationTest_GBS(dat = h5, res.parent = 'Erin', sus.parent = 'Newton')
   est.introgression(dat = h5, chrom = '6B')
   
   # Flynn x Newton - H6
-  associationTest(dat = h6, res.parent = 'Flynn', sus.parent = 'Newton')
+  associationTest_GBS(dat = h6, res.parent = 'Flynn', sus.parent = 'Newton')
   est.introgression(dat = h6, chrom = '1A')
   
   # Joy x Newton - H10
-  associationTest(dat = h10, res.parent = 'Joy', sus.parent = 'Newton')
+  associationTest_GBS(dat = h10, res.parent = 'Joy', sus.parent = 'Newton')
   est.introgression(dat = h10, chrom = '6D')
   
   # Lola x Newton - H12
-  associationTest(dat = h12, res.parent = 'Lola', sus.parent = 'Newton')
+  associationTest_GBS(dat = h12, res.parent = 'Lola', sus.parent = 'Newton')
   est.introgression(dat = h12, chrom = '3B')
   
   # Molly x Newton - H13
-  associationTest(dat = h13.newton, res.parent = 'Molly', sus.parent = 'Newton')
+  associationTest_GBS(dat = h13.newton, res.parent = 'Molly', sus.parent = 'Newton')
   est.introgression(dat = h13.newton, chrom = '6D')
   
   # Molly x Overley - H13
-  associationTest(dat = h13.overley, res.parent = 'Molly', sus.parent = 'Overley')
+  associationTest_GBS(dat = h13.overley, res.parent = 'Molly', sus.parent = 'Overley')
   est.introgression(dat = h13.overley, chrom = '6D')
   
   # KU2147 x Overley - H26
-  associationTest(dat = h26, res.parent = 'KU2147', sus.parent = 'Overley', miss = 0.5)
+  associationTest_GBS(dat = h26, res.parent = 'KU2147', sus.parent = 'Overley', miss = 0.5)
   est.introgression(dat = h26, chrom = '3D')
   
   # SynOP DH - H32
-  associationTest(dat = h32, res.parent = 'SyntheticW7984', sus.parent = 'OpataM85')
+  associationTest_GBS(dat = h32, res.parent = 'SyntheticW7984', sus.parent = 'OpataM85')
   est.introgression(dat = h32, chrom = '3D')
   
   
