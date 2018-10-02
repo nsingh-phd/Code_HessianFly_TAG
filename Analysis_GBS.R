@@ -1,6 +1,7 @@
 ## ###########################
 ## Hessian Fly TAG Manuscript
 ## Author - Narinder Singh
+## Mapping with GBS SNP calls
 ## ###########################
 
 # load required functions, files, and packages
