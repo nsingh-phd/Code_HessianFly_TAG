@@ -1,6 +1,7 @@
 data/
 log.txt
 output/
+*.pdf
 
 .Rproj.user
 .Rhistory
