@@ -3,6 +3,10 @@
 ## Narinder Singh      ##
 ## ################### ##
 
+## load packages
+  if(!require(pacman)) install.packages(pacman); require(pacman)
+  p_load(data.table, qqman)
+
 ## ################### ##
 ## Compute basic stats ##
 ## ################### ##
@@ -38,11 +42,11 @@ basic.stats <- function(hap = x) {
   return(hap)
 }
 
-## ################ ##
-## Association Test ##
-## ################ ##
+## #################### ##
+## Association Test GBS ##
+## #################### ##
 
-associationTest <- function(dat = NULL, res.parent = NULL, sus.parent = NULL, miss = 0.2, maf = 0.3, alpha = 0.001) {
+associationTest_GBS <- function(dat = NULL, res.parent = NULL, sus.parent = NULL, miss = 0.2, maf = 0.3, alpha = 0.001) {
   # change names to strings
     pop.id <- deparse(substitute(dat))
 
@@ -98,9 +102,8 @@ associationTest <- function(dat = NULL, res.parent = NULL, sus.parent = NULL, mi
     geno <- geno[sumNA < (ncol(geno) - 1),]
   
   # run association test and get p-value
-    f.test <- cbind(as.character(colnames(geno)[2:ncol(geno)]), NA)
-    colnames(f.test) <- c('tag','p.value')
-    
+    f.test <- data.frame('tag' = colnames(geno)[-1], 'p.value' = NA, stringsAsFactors = F)
+
     cat('\n')
     cat('Performing association...')
     for (i in 2:ncol(geno)) {
@@ -153,7 +156,7 @@ associationTest <- function(dat = NULL, res.parent = NULL, sus.parent = NULL, mi
   ## plot
   qq(f.test$P)
   
-  pdf(paste0(pop.id, '_genomewide.pdf'), height = 6.5, width = 11)
+  pdf(paste0(pop.id, '.GBS.genomewide.pdf'), height = 6.5, width = 11)
   manhattan(f.test, suggestiveline = F, genomewideline = -log10(alpha/nrow(f.test)), 
             chrlabs = chrNames, col = cols, ylab='', xlab='')
   mtext('Chromosome', 1, line = 2.8, cex = 1.5)
@@ -162,10 +165,73 @@ associationTest <- function(dat = NULL, res.parent = NULL, sus.parent = NULL, mi
   dev.off()
   
   # assign f.test to a new object for output
-  assign(paste0('f.test.', pop.id), f.test, envir = .GlobalEnv)
+  assign(paste0('f.test.GBS.', pop.id), f.test, envir = .GlobalEnv)
   
 }
 
+
+## ############################# ##
+## Association Test Allele count ##
+## ############################# ##
+
+associationTest_AC <- function(data = NULL, pop.id = NULL, gene = NULL, alpha = 0.001) {
+  # create a dataset with population specific columns
+    dat <- data[, c(1:4, grep(paste0(pop.id, '_'), colnames(data)))]
+    dat <- dat[, c(1:4, order(colnames(dat)[-c(1:4)]) + 4)]
+    dat <- dat[grep('UN', dat$CHR, ignore.case = T, invert = T), ]
+  # remove SNPs if total missing data and each allele count is less than 3
+    dat <- dat[complete.cases(dat) & rowSums(dat[, 5:8] >= 1) == 4, ]
+  # create a data frame to store p.values
+    pVals <- as.matrix(data.frame('CHR' = dat$CHR, 'BP' = dat$POS,
+                                  'SNP' = paste0(dat$CHR, '_', dat$POS), 'P' = NA, stringsAsFactors = F))
+  # compute p.value
+    for (i in 1:nrow(dat)) {
+      counts = matrix(data = as.numeric(dat[i, 5:8]), nrow = 2, ncol = 2)
+      if (T
+          # keep snps with higher count of alt in res and ref in sus
+            & which.max(counts[, 1]) == 1 & which.max(counts[, 2]) == 2
+          # kepp snps with ratio of max / min is greater than 1.25
+            & (max(counts[, 1]) / min(counts[, 1])) >= 1.25
+            & (max(counts[, 2]) / min(counts[, 2])) >= 1.25) {
+              # perform fisher test and assign pvalue to dataframe
+                test <- fisher.test(counts)
+                pVals[i, 4] <- test$p.value
+          }
+      }
+      # convert to data frame and remove snps with no pvalue
+        pVals <- as.data.frame(pVals, stringsAsFactors = F)
+        pVals <- pVals[complete.cases(pVals), ]
+      # change chrom from text to numeric
+        pVals$CHRHomoeo <- pVals$CHR
+          for (i in 1:7) {
+            pVals$CHR[pVals$CHR == paste(i, 'A', sep = '')] = i * 3 - 2
+            pVals$CHR[pVals$CHR == paste(i, 'B', sep = '')] = i * 3 - 1
+            pVals$CHR[pVals$CHR == paste(i, 'D', sep = '')] = i * 3
+          }
+        pVals$CHR <- as.numeric(pVals$CHR)
+      # change other cols to numeric
+        pVals$BP <- as.numeric(pVals$BP)
+        pVals$P <- as.numeric(pVals$P)
+      
+      ## plot
+        qq(pVals$P)
+        
+        chrNames <- unique(pVals$CHRHomoeo)
+        cols <- rep('black', length(chrNames))
+        cols[grep('B', chrNames)] = 'red'
+        cols[grep('D', chrNames)] = 'blue'
+        
+        pdf(paste0(gene, '.AC.genomewide.pdf'), height = 6.5, width = 11)
+        manhattan(pVals, suggestiveline = F, genomewideline = -log10(alpha / nrow(pVals)), 
+                  chrlabs = chrNames, col = cols, ylab='', xlab='')
+        mtext('Chromosome', 1, line = 2.8, cex = 1.5)
+        mtext('-log10(p)', 2, line = 2.7, cex = 1.5)
+        
+        dev.off()
+        
+      # assign pvalue dataframe to global variable
+        assign(paste0('f.test.AC.', pop.id), pVals, envir = .GlobalEnv)
+}
 
 ## ###################### ##
 ## Estimate introgression ##
@@ -174,7 +240,7 @@ associationTest <- function(dat = NULL, res.parent = NULL, sus.parent = NULL, mi
 est.introgression <- function(dat = NULL, chrom = NULL, alpha = 0.001) {
   # assign a particular f.test data to dat variable
   pop.id <- deparse(substitute(dat))
-  assign('dat', get(paste0('f.test.', pop.id)))
+  assign('dat', get(paste0('f.test.GBS.', pop.id)))
   
   # chrom to numeric
   chrom.name <- chrom
@@ -185,7 +251,7 @@ est.introgression <- function(dat = NULL, chrom = NULL, alpha = 0.001) {
   # get chrom specific snps
   chr_snps <- dat[dat$CHR == chrom, ]
   
-  pdf(paste0(pop.id, '_introgression.pdf'), height = 6.5, width = 11)
+  pdf(paste0(pop.id, '.GBS.introgression.pdf'), height = 6.5, width = 11)
   manhattan(chr_snps, suggestiveline = F, genomewideline = -log10(alpha/nrow(dat)), 
             cex.lab = 1, xlab = '', ylab = '', xaxt = 'n')
   axis(side = 1, at = seq(0, 900, 100) * 10^6, labels = seq(0, 900, 100))
