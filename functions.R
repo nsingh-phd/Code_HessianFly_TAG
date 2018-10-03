@@ -10,6 +10,15 @@
 ## default alpha
   alpha = 0.001
 
+## chrom info file
+  chrom.info <- read.table('data/chrom_info.txt', header = T, as.is = T)
+  
+## assign chromosome colors
+  chrNames <- sort(unique(chrom.info$chrom_simple))
+  cols <- rep('black', length(chrNames))
+  cols[grep('B', chrNames)] = 'red'
+  cols[grep('D', chrNames)] = 'blue'
+  
 ## ################### ##
 ## Compute basic stats ##
 ## ################### ##
@@ -185,8 +194,8 @@ associationTest_AC <- function(data = NULL, pop.id = NULL, gene = NULL, alpha = 
   # remove SNPs if total missing data and each allele count is less than 3
     dat <- dat[complete.cases(dat) & rowSums(dat[, 5:8] >= 1) == 4, ]
   # create a data frame to store p.values
-    pVals <- as.matrix(data.frame('CHR' = dat$CHR, 'BP' = dat$POS,
-                                  'SNP' = paste0(dat$CHR, '_', dat$POS), 'P' = NA, stringsAsFactors = F))
+    pVals <- as.matrix(data.frame('SNP' = paste0(dat$CHR, '_', dat$POS), 'P' = NA,
+                                  'CHR' = dat$CHR, 'BP' = dat$POS, stringsAsFactors = F))
   # compute p.value
     for (i in 1:nrow(dat)) {
       counts = matrix(data = as.numeric(dat[i, 5:8]), nrow = 2, ncol = 2)
@@ -198,7 +207,7 @@ associationTest_AC <- function(data = NULL, pop.id = NULL, gene = NULL, alpha = 
             & (max(counts[, 2]) / min(counts[, 2])) >= 1.25) {
               # perform fisher test and assign pvalue to dataframe
                 test <- fisher.test(counts)
-                pVals[i, 4] <- test$p.value
+                pVals[i, 2] <- test$p.value
           }
       }
       # convert to data frame and remove snps with no pvalue
@@ -282,6 +291,6 @@ plotManhattan <- function(dat = NULL) {
             ylim = c(0, range(-log10(dat[, i]), na.rm = T)[2] + 2),
             chrlabs = chrNames, col = cols, ylab='', xlab='', cex = 1, cex.axis = 1.25)
   abline(h = -log10(alpha / sum(!is.na(dat[, i]))), lty = 3, col = 'red')
-  mtext(text = '-log10(p)', 2, line = 2.7, cex = 1.25)
+  mtext(text = '-log10(p)', 2, line = 2.7, cex = 1)
   legend('topleft', legend = bquote(bold(.(toupper(paste0(colnames(dat)[i],'    '))))), cex = 1.25, bg = 'gray90')
 }
