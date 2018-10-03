@@ -57,7 +57,7 @@
   h32 <- parse_pop('SynOp', 'SyntheticW7984', 'OpataM85')
   
   # SynOP Phenotypes
-  syn.op.pheno <- read.table(file = 'data/SynOpDH_hfly_score.txt', header = T, as.is = T)
+  syn.op.pheno <- read.table(file = 'required_files/SynOpDH_hfly_score.txt', header = T, as.is = T)
   
   # remove samples with no phenotype from h32 population
   h32 <- h32[, colnames(h32) %in% syn.op.pheno$line]
