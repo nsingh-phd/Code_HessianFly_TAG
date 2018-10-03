@@ -7,6 +7,9 @@
   if(!require(pacman)) install.packages(pacman); require(pacman)
   p_load(data.table, qqman)
 
+## default alpha
+  alpha = 0.001
+
 ## ################### ##
 ## Compute basic stats ##
 ## ################### ##
@@ -268,4 +271,17 @@ est.introgression <- function(dat = NULL, chrom = NULL, alpha = 0.001) {
   legend('topright', legend = paste('Introgression size =', round(introgressionSize/1000000, 2), 'Mb', sep = ' '), cex = 1)
   
   dev.off()
+}
+
+## ############## ##
+## Plot Manhattan ##
+## ############## ##
+
+plotManhattan <- function(dat = NULL) {
+  manhattan(dat, p = colnames(dat)[i], suggestiveline = F, genomewideline = F,
+            ylim = c(0, range(-log10(dat[, i]), na.rm = T)[2] + 2),
+            chrlabs = chrNames, col = cols, ylab='', xlab='', cex = 1, cex.axis = 1.25)
+  abline(h = -log10(alpha / sum(!is.na(dat[, i]))), lty = 3, col = 'red')
+  mtext(text = '-log10(p)', 2, line = 2.7, cex = 1.25)
+  legend('topleft', legend = bquote(bold(.(toupper(paste0(colnames(dat)[i],'    '))))), cex = 1.25, bg = 'gray90')
 }
