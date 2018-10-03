@@ -168,7 +168,7 @@ associationTest_GBS <- function(dat = NULL, res.parent = NULL, sus.parent = NULL
   ## plot
   qq(f.test$P)
   
-  pdf(paste0(pop.id, '.GBS.genomewide.pdf'), height = 6.5, width = 11)
+  pdf(file = paste0('output/', pop.id, '.GBS.genomewide.pdf'), height = 6.5, width = 11)
   manhattan(f.test, suggestiveline = F, genomewideline = -log10(alpha/nrow(f.test)), 
             chrlabs = chrNames, col = cols, ylab='', xlab='')
   mtext('Chromosome', 1, line = 2.8, cex = 1.5)
