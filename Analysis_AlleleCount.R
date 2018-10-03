@@ -4,8 +4,7 @@
 ## Mapping with Allele counts
 ## ###########################
 
-# load required functions, files, and packages
-  chrom.info <- read.table('data/chrom_info.txt', header = T, as.is = T)
+# load required functions
   source("functions.R")
 
 # read allele counts
