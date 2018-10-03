@@ -233,7 +233,7 @@ associationTest_AC <- function(data = NULL, pop.id = NULL, gene = NULL, alpha = 
         cols[grep('B', chrNames)] = 'red'
         cols[grep('D', chrNames)] = 'blue'
         
-        pdf(paste0(gene, '.AC.genomewide.pdf'), height = 6.5, width = 11)
+        pdf(file = paste0('output/', gene, '.AC.genomewide.pdf'), height = 6.5, width = 11)
         manhattan(pVals, suggestiveline = F, genomewideline = -log10(alpha / nrow(pVals)), 
                   chrlabs = chrNames, col = cols, ylab='', xlab='')
         mtext('Chromosome', 1, line = 2.8, cex = 1.5)
@@ -263,7 +263,7 @@ est.introgression <- function(dat = NULL, chrom = NULL, alpha = 0.001) {
   # get chrom specific snps
   chr_snps <- dat[dat$CHR == chrom, ]
   
-  pdf(paste0(pop.id, '.GBS.introgression.pdf'), height = 6.5, width = 11)
+  pdf(file = paste0('output/', pop.id, '.GBS.introgression.pdf'), height = 6.5, width = 11)
   manhattan(chr_snps, suggestiveline = F, genomewideline = -log10(alpha/nrow(dat)), 
             cex.lab = 1, xlab = '', ylab = '', xaxt = 'n')
   axis(side = 1, at = seq(0, 900, 100) * 10^6, labels = seq(0, 900, 100))
