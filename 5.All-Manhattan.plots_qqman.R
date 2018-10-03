@@ -36,7 +36,7 @@
 ## GBS Plots ##
 ###############
 
-  pdf('manhattan_plots.GBS.pdf', height = 11, width = 8.5)
+  pdf('output/manhattan_plots.GBS.pdf', height = 11, width = 8.5)
   # create some padding around the plots
     par(mfrow=c(4,1), oma = c(2, 4, 1, 1), mar = c(3.5, 0, 0, 0)) 
   
@@ -50,7 +50,7 @@
 ## AC Plots ##
 ##############
   
-  pdf('manhattan_plots.AC.pdf', height = 11, width = 8.5)
+  pdf('output/manhattan_plots.AC.pdf', height = 11, width = 8.5)
   # create some padding around the plots
   par(mfrow=c(4,1), oma = c(2, 4, 1, 1), mar = c(3.5, 0, 0, 0)) 
   
