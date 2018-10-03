@@ -4,8 +4,7 @@
 ## Mapping with GBS SNP calls
 ## ###########################
 
-# load required functions and files
-  chrom.info <- read.table('data/chrom_info.txt', header = T, as.is = T)
+# load required functions
   source("functions.R")
   
 # read hapfile
