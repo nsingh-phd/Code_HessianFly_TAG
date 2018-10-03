@@ -11,7 +11,7 @@
   alpha = 0.001
 
 ## chrom info file
-  chrom.info <- read.table('data/chrom_info.txt', header = T, as.is = T)
+  chrom.info <- read.table('required_files/chrom_info.txt', header = T, as.is = T)
   
 ## assign chromosome colors
   chrNames <- sort(unique(chrom.info$chrom_simple))
