@@ -233,7 +233,7 @@ associationTest_AC <- function(data = NULL, pop.id = NULL, gene = NULL, alpha = 
         dev.off()
         
       # assign pvalue dataframe to global variable
-        assign(paste0('f.test.AC.', pop.id), pVals, envir = .GlobalEnv)
+        assign(paste0('f.test.AC.', gene), pVals, envir = .GlobalEnv)
 }
 
 ## ###################### ##
