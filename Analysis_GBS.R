@@ -42,7 +42,9 @@
 
 # function to parse out populations
   parse_pop <- function(id=NULL, r.parent=NULL, s.parent=NULL) {
-    return(hapgeno.orig[, grep(paste(c(id, r.parent, s.parent), collapse = '|'), colnames(hapgeno.orig))])
+    datf <- hapgeno.orig[, grep(paste(c(id, r.parent, s.parent), collapse = '|'), colnames(hapgeno.orig))]
+    rownames(datf) <- hap.orig$`rs#`
+    return(datf)
   }
 
 # separate out the populations
