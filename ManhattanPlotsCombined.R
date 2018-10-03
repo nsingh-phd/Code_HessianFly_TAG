@@ -14,7 +14,9 @@
     f.tests.GBS.combined <- Reduce(f = function(dtf1, dtf2) merge(dtf1, dtf2, by = c('SNP', 'CHR', 'BP', 'CHRHomoeo'), all = T),
                                    x = mget(f.tests.GBS))
     f.tests.GBS.combined <- f.tests.GBS.combined[order(f.tests.GBS.combined$CHR, f.tests.GBS.combined$BP), ]
-
+  # remove individual dataframes
+    rm(list = f.tests.GBS)
+    
 ## ##############
 ## Allele counts
 ## ##############
@@ -31,7 +33,9 @@
     f.tests.AC.combined <- Reduce(f = function(dtf1, dtf2) merge(dtf1, dtf2, by = c('SNP', 'CHR', 'BP', 'CHRHomoeo'), all = T),
                                   x = mget(f.tests.AC))
     f.tests.AC.combined <- f.tests.AC.combined[order(f.tests.AC.combined$CHR, f.tests.AC.combined$BP), ]
-
+  # remove individual dataframes
+    rm(list = f.tests.AC)
+    
 ###############
 ## GBS Plots ##
 ###############
