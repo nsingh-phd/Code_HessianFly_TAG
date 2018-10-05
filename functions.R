@@ -5,7 +5,7 @@
 
 ## load packages
   if(!require(pacman)) install.packages(pacman); require(pacman)
-  p_load(data.table, qqman)
+  p_load(data.table, qqman, CMplot)
 
 ## default alpha
   alpha = 0.001
