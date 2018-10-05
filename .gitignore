@@ -2,6 +2,7 @@ data/
 log.txt
 output/
 *.pdf
+*.jpg
 
 .Rproj.user
 .Rhistory
