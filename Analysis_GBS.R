@@ -51,10 +51,10 @@
   }
 
 # separate out the populations
-  h3 <- parse_pop('CN_', 'Carol', 'Newton')
+  # h3 <- parse_pop('CN_', 'Carol', 'Newton')
   h5 <- parse_pop('EN_', 'Erin', 'Newton')
   h6 <- parse_pop('FN_', 'Flynn', 'Newton')
-  h10 <- parse_pop('JN_', 'Joy', 'Newton')
+  # h10 <- parse_pop('JN_', 'Joy', 'Newton')
   h12 <- parse_pop('LN_', 'Lola', 'Newton')
   h13.newton <- parse_pop('MN_', 'Molly', 'Newton')
   h13.overley <- parse_pop('MO_', 'Molly', 'Overley')

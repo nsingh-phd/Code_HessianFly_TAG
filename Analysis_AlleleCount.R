@@ -16,7 +16,7 @@
 ## association tests
   
   # # Carol x Newton - H3
-  associationTest_AC(data = alleleCounts, pop.id = 'CN', gene = 'h3')
+  # associationTest_AC(data = alleleCounts, pop.id = 'CN', gene = 'h3')
   
   # Erin x Newton - H5
   associationTest_AC(data = alleleCounts, pop.id = 'EN', gene = 'h5')
@@ -25,7 +25,7 @@
   associationTest_AC(data = alleleCounts, pop.id = 'FN', gene = 'h6')
   
   # Joy x Newton - H10
-  associationTest_AC(data = alleleCounts, pop.id = 'JN', gene = 'h10')
+  # associationTest_AC(data = alleleCounts, pop.id = 'JN', gene = 'h10')
   
   # Lola x Newton - H12
   associationTest_AC(data = alleleCounts, pop.id = 'LN', gene = 'h12')
