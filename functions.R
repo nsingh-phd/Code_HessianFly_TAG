@@ -294,3 +294,31 @@ plotManhattan <- function(dat = NULL) {
   mtext(text = '-log10(p)', 2, line = 2.7, cex = 1)
   legend('topleft', legend = bquote(bold(.(toupper(paste0(colnames(dat)[i],'    '))))), cex = 1.25, bg = 'gray90')
 }
+
+## ############### ##
+## Identity matrix ##
+## ############### ##
+
+alleleMatching <- function(allele.match = NULL) {
+  nS <- ncol(allele.match)
+  id <- matrix(NA, nrow = nS, ncol = nS)
+  for (i in 1:nrow(id)){
+    id_ct <- rep(NA, length(i:nrow(id)))
+    id_pc <- rep(NA, length(i:nrow(id)))
+    for (j in i:ncol(id)){
+      line1 <- as.character(allele.match[, i])
+      line2 <- as.character(allele.match[, j])
+      shared <- !is.na(line1) & !is.na(line2) & line1 != "H" & line2 != "H"
+      common <- line1[shared] == line2[shared]
+      id_pc[j-i+1] <- sum(common) / sum(shared)
+      id_ct[j-i+1] <- sum(shared)
+    }
+    id[i,i:ncol(id)] <- id_ct
+    id[i:ncol(id),i] <- id_pc
+  }
+  rownames(id) <- colnames(allele.match)
+  colnames(id) <- colnames(allele.match)
+  write.table(id, file = "output/idFull.mat", quote = F, sep = "\t")
+  cat('Done computing. Identity matrix has been saved as a tab-delimited file named idFull.mat in the output folder')
+  return(id)
+}

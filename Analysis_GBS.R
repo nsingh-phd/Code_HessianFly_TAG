@@ -37,6 +37,9 @@
   # convert back to data frame
     hapgeno.orig <- data.frame(hapgeno.orig, stringsAsFactors = F, check.names = F)
 
+# combine hapgeno.orig with original hap.orig 11 cols
+    hap.orig <- data.frame(hap.orig[, 1:11], hapgeno.orig, stringsAsFactors = F)
+
 # print out hapgeno.orig colnames to see populations
   sort(colnames(hapgeno.orig))
 
@@ -114,4 +117,23 @@
   associationTest_GBS(dat = h32, res.parent = 'SyntheticW7984', sus.parent = 'OpataM85')
   est.introgression(dat = h32, chrom = '3D')
   
+## ########################## ##
+## Check isolines with Newton ##
+## ########################## ##
   
+  # create isolines matrix
+    isolines <- c('carol', 'erin', 'flynn', 'iris', 'joy', 'karen', 'lola', 'molly', 'newton')
+    isolines.mat <- hap.orig[, grep(paste(isolines, collapse = '|'), colnames(hap.orig), ignore.case = T)]
+  # missing data data.frame
+    isolines.missing <- colSums(is.na(isolines.mat), na.rm = T)
+    isolines.missing <- data.frame('before' = isolines.missing, 'after' = NA, stringsAsFactors = F)
+  # replace SNP calls to NA for the chromosomes with introgression
+    isolines.mat$Erin[grep('6B', hap.orig$chrom)] = NA
+    isolines.mat$Flynn[grep('1A', hap.orig$chrom)] = NA
+    isolines.mat$Lola[grep('3B', hap.orig$chrom)] = NA
+    isolines.mat$Molly[grep('6D', hap.orig$chrom)] = NA
+  # check before and after missing data
+    isolines.missing$after <- colSums(is.na(isolines.mat), na.rm = T)
+  # allele matching
+    id <- alleleMatching(allele.match = isolines.mat)
+        
