@@ -1,54 +1,45 @@
-####################
-# full chromosome 6D
-####################
 
-pdf('Fig.4_H10_H13.pdf', width = 11, height = 6.5)
+##################################### ##
+## AC and GBS manhattan plots stacked ##
+##################################### ##
 
-molly_6d.newton2 = molly_6d.newton
-molly_6d.newton2$BP = molly_6d.newton2$BP/1000000
-
-# molly newton
-manhattan(molly_6d.newton2, suggestiveline = F, genomewideline = F,
-          xlab = 'Chromosome 6D position in Mb', xlim = range(0, 510),
-          cex.lab=1.4)
-abline(h = -log10(alpha/nrow(allchr_bwa)), lty = 3, col = 'red')
-
-# molly overley
-
-points(molly_6d.overley$BP/1000000, -log10(molly_6d.overley$P), col=2)
-
-# joy newton
-points(joy_6d$BP/1000000, -log10(joy_6d$P), col=3)
-
-# centromere
-abline(v=214085311/1000000, col='gray', lwd=7) #6D - Molly and Joy
-text(x = 214085400/1000000, y = 9, labels = 'Centromere', srt=90, pos=4, offset = 0.7, cex = 1)
-text(x = 220086000/1000000, y = 7.5, labels = 'Bonferroni threshold', pos=4, offset = 0.7, cex = 1)
-
-# legend
-legend('topright', legend = c('H13-MN', 'H13-MO', 'H10-JN', 'Bonferroni threshold'), col = c(1, 2, 3, 2),
-       pch = c(20,1,1,NA), lty = c(NA,NA,NA,3), cex = 1)
-
-dev.off()
-
-
-###########################
-# portion of the chromosome
-###########################
-pdf('molly_joy_6DS_part.pdf', width = 11, height = 6.5)
-
-# molly newton
-manhattan(molly_6d.newton, suggestiveline = F, genomewideline = -log10(alpha/nrow(allchr_bwa)), cex.lab=1.4, xlim=c(15000000, 33039120))
-
-# molly overley
-points(molly_6d.overley$BP, -log10(molly_6d.overley$P), col=2)
-
-# joy newton
-points(joy_6d$BP, -log10(joy_6d$P), col=3)
-
-# legend
-legend('topright', legend = c('H13-MN', 'H13-MO', 'H10-JN'), col = c(1, 2, 3), pch = c(20,1,1), cex = 1)
-
-dev.off()
-
-#####################
+# remove 'S' from SNP name in f.tests.AC.combined
+  f.tests.AC.combined$SNP <- sub(pattern = '^S', replacement = '', f.tests.AC.combined$SNP)
+# combine f.tests.AC.combined and f.tests.GBS.combined and order by chr and snp position
+  f.tests.combined <- merge(f.tests.GBS.combined, f.tests.AC.combined, by = c('SNP', 'CHR', 'BP', 'CHRHomoeo'), all = T)
+  f.tests.combined <- f.tests.combined[order(f.tests.combined$CHR, f.tests.combined$BP), ]
+# replace x and y in colnames with gbs and AC
+  colnames(f.tests.combined) <- sub(pattern = 'x$', replacement = 'gbs', colnames(f.tests.combined))
+  colnames(f.tests.combined) <- sub(pattern = 'y$', replacement = 'AC', colnames(f.tests.combined))
+  colnames(f.tests.combined)[19:20] <- paste0(colnames(f.tests.combined)[19:20], '.AC')
+# sort chromosomes
+  f.tests.combined <- f.tests.combined[, c(1:4, order(colnames(f.tests.combined)[-c(1:4)]) + 4)]
+# create a pdf file to hold plots
+  pdf('output/manhattan_plots.AC.GBS.pdf', height = 11, width = 8.5)
+# create some padding around the plots
+  par(mfrow=c(4,1), oma = c(2, 4, 1, 1), mar = c(3.5, 0, 0, 0)) 
+# plot manhattan plot
+  for (i in 5:ncol(f.tests.combined)) {
+    plotManhattan(dat = f.tests.combined)
+  }
+  dev.off()  
+  
+  
+## ############################ ##
+## Single chrom manhattan plots ##
+## ############################ ##
+  
+  pdf('output/H13.H26.combined.pdf', width = 8.5, height = 7)
+  # create some padding around the plots
+  par(mfrow=c(2,1), oma = c(2, 4, 1, 1), mar = c(3.5, 0, 0, 0)) 
+  
+  plotManhattan_chrom(dat = f.tests.combined, chrom = "6D", gene = "h13", legend.pos = 'topright')
+  
+  plotManhattan_chrom(dat = f.tests.combined, chrom = "3D", gene = "h26", legend.pos = 'topleft')
+  
+  dev.off()
+  
+## ### ##
+## END ##
+## ### ##
+  
