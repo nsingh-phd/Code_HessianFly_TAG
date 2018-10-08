@@ -295,6 +295,31 @@ plotManhattan <- function(dat = NULL) {
   legend('topleft', legend = bquote(bold(.(toupper(paste0(colnames(dat)[i],'    '))))), cex = 1.25, bg = 'gray90')
 }
 
+## ################################ ##
+## Plot Manhattan single chromosome ##
+## ################################ ##
+
+plotManhattan_chrom <- function(dat = NULL, chrom = NULL, gene = NULL, legend.pos = NULL) {
+  # subset the dataframe with specific population and specific chromosome
+    data <- dat[dat$CHRHomoeo == chrom, c(1:4, grep(gene, colnames(dat)))]
+  # set up ylim.max limit
+    ylim.max = min(apply(h13.combined[, -c(1:4)], 2, function(p) max(-log10(na.omit(p)))))
+  # plot manhattan
+    manhattan(data, p = colnames(data)[5], suggestiveline = F, genomewideline = F, ylim = c(0, ylim.max + 15),
+              ylab='', xlab='', cex = 1, cex.axis = 1, xaxt = 'n')
+    abline(h = -log10(alpha / nrow(data)), lty = 3, col = 'red')
+    axis(side = 1, at = seq(0, 900, 100) * 10^6, labels = seq(0, 900, 100))
+    mtext(text = '-log10(p)', 2, line = 2.7, cex = 1)
+    mtext(text = paste0('Chromosome ', chrom, ' (Mb)'), side = 1, line = 3, cex = 1)
+
+    for (i in 6:ncol(data)) {
+      points(data$BP, -log10(data[, i]), col = i-4)
+    }
+    
+    legend(legend.pos, legend = toupper(paste0(colnames(data)[-c(1:4)],'    ')), 
+           pch = c(16,1,1,1), col = c(1,2,3,4), cex = 0.75)
+}
+
 ## ############### ##
 ## Identity matrix ##
 ## ############### ##
