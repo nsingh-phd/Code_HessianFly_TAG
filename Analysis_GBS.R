@@ -117,6 +117,34 @@
   associationTest_GBS(dat = h32, res.parent = 'SyntheticW7984', sus.parent = 'OpataM85')
   est.introgression(dat = h32, chrom = '3D')
   
+## ########################### ##
+## Manhattan plots in one file ##
+## ########################### ##
+  
+  # get list of data frames to merge
+  f.tests.GBS <- ls(pattern = 'f.test.GBS')
+  # change P values colname to gene to aviod conflict
+  for (i in 1:length(f.tests.GBS)) {
+    dat <- get(f.tests.GBS[i])
+    colnames(dat)[2] <- substring(text = f.tests.GBS[i], first = 12)
+    assign(paste0(f.tests.GBS[i]), dat, envir = .GlobalEnv)
+  }
+  # merge all data frames and order based on chromosome and SNP positions
+  f.tests.GBS.combined <- Reduce(f = function(dtf1, dtf2) merge(dtf1, dtf2, by = c('SNP', 'CHR', 'BP', 'CHRHomoeo'), all = T),
+                                 x = mget(f.tests.GBS))
+  f.tests.GBS.combined <- f.tests.GBS.combined[order(f.tests.GBS.combined$CHR, f.tests.GBS.combined$BP), ]
+  # remove individual dataframes
+  rm(list = f.tests.GBS)
+  # create a pdf file for plotting
+  pdf('output/manhattan_plots.GBS.pdf', height = 11, width = 8.5)
+  # create some padding around the plots
+  par(mfrow=c(4,1), oma = c(2, 4, 1, 1), mar = c(3.5, 0, 0, 0)) 
+  # plot manhattan plot
+  for (i in 5:ncol(f.tests.GBS.combined)) {
+    plotManhattan(dat = f.tests.GBS.combined)
+  }
+  dev.off()
+  
 ## ########################## ##
 ## Check isolines with Newton ##
 ## ########################## ##
@@ -136,4 +164,7 @@
     isolines.missing$after <- colSums(is.na(isolines.mat), na.rm = T)
   # allele matching
     id <- alleleMatching(allele.match = isolines.mat)
-        
+
+## ### ##
+## END ##
+## ### ##
