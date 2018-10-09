@@ -316,7 +316,7 @@ plotManhattan_chrom <- function(dat = NULL, chrom = NULL, gene = NULL, legend.po
   # subset the dataframe with specific population and specific chromosome
     data <- dat[dat$CHRHomoeo == chrom, c(1:4, grep(gene, colnames(dat)))]
   # set up ylim.max limit
-    ylim.max = min(apply(h13.combined[, -c(1:4)], 2, function(p) max(-log10(na.omit(p)))))
+    ylim.max = min(apply(data[, -c(1:4)], 2, function(p) max(-log10(na.omit(p)))))
   # plot manhattan
     manhattan(data, p = colnames(data)[5], suggestiveline = F, genomewideline = F, ylim = c(0, ylim.max + 15),
               ylab='', xlab='', cex = 1, cex.axis = 1, xaxt = 'n')
