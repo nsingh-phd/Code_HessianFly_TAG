@@ -144,7 +144,7 @@ associationTest_GBS <- function(dat = NULL, res.parent = NULL, sus.parent = NULL
     f.test <- f.test[grep('UN', f.test[, 1], invert = T), ]
     colnames(f.test) <- c('SNP', 'P', 'CHR', 'BP', 'CHRHomoeo')
     f.test$BP <- as.integer(gsub('(.+)_(\\d+)', '\\2', f.test$SNP))
-    f.test$CHR <- gsub('S(.+)_(\\d+)', '\\1', f.test$SNP)
+    f.test$CHR <- gsub('(.+)_(\\d+)', '\\1', f.test$SNP)
     f.test$CHRHomoeo <- f.test$CHR
     f.test$P <- as.numeric(as.character(f.test$P))
     
@@ -175,7 +175,9 @@ associationTest_GBS <- function(dat = NULL, res.parent = NULL, sus.parent = NULL
   cat('\n')
   
   ## plot
+  pdf(file = paste0('output/', pop.id, '.GBS.QQ.Plot.pdf'), height = 6.5, width = 11)
   qq(f.test$P)
+  dev.off()
   
   pdf(file = paste0('output/', pop.id, '.GBS.genomewide.pdf'), height = 6.5, width = 11)
   manhattan(f.test, suggestiveline = F, genomewideline = -log10(alpha/nrow(f.test)), 
@@ -235,7 +237,9 @@ associationTest_AC <- function(data = NULL, pop.id = NULL, gene = NULL, alpha = 
         pVals$P <- as.numeric(pVals$P)
       
       ## plot
+        pdf(file = paste0('output/', gene, '.AC.QQ.Plot.pdf'), height = 6.5, width = 11)
         qq(pVals$P)
+        dev.off()
         
         chrNames <- unique(pVals$CHRHomoeo)
         cols <- rep('black', length(chrNames))
