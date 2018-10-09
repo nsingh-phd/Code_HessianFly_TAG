@@ -24,7 +24,7 @@
 ## ################################# ##
 parse_pop <- function(id=NULL, r.parent=NULL, s.parent=NULL) {
   datf <- hapgeno.orig[, grep(paste(c(id, r.parent, s.parent), collapse = '|'), colnames(hapgeno.orig))]
-  rownames(datf) <- hap.orig$`rs#`
+  rownames(datf) <- hap.orig$rs
   return(datf)
 }
   
