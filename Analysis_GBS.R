@@ -126,8 +126,8 @@
   f.tests.GBS.combined <- Reduce(f = function(dtf1, dtf2) merge(dtf1, dtf2, by = c('SNP', 'CHR', 'BP', 'CHRHomoeo'), all = T),
                                  x = mget(f.tests.GBS))
   f.tests.GBS.combined <- f.tests.GBS.combined[order(f.tests.GBS.combined$CHR, f.tests.GBS.combined$BP), ]
-  # remove individual dataframes
-  rm(list = f.tests.GBS)
+  # remove 'S' from SNP name
+  f.tests.GBS.combined$SNP <- sub(pattern = '^S', replacement = '', f.tests.GBS.combined$SNP)
   # create a pdf file for plotting
   pdf('output/manhattan_plots.GBS.pdf', height = 11, width = 8.5)
   # create some padding around the plots
