@@ -360,3 +360,26 @@ alleleMatching <- function(allele.match = NULL) {
   cat('Done computing. Identity matrix has been saved as a tab-delimited file named idFull.mat in the output folder')
   return(id)
 }
+
+## ########### ##
+## Pheno plots ##
+## ########### ##
+
+phenoPlots <- function(values = NULL, name = NULL, alpha = 0.05) {
+  chiTest <- chisq.test(values, p = c(0.25, 0.5, 0.25))
+  midpoints <- barplot(values, plot = F)
+  barplot(values, col = c("darkgreen","yellow","red"), ylab = "Number of lines", 
+          cex.names = 1.5, cex.axis = 1.5, cex.lab = 1.5,
+          main = name,
+          cex.main = 2, names.arg = c("RR", "Rr", "rr"))
+  text(midpoints, values - 10, labels = values, cex = 1.5)
+  
+  p = round(chiTest$p.value, digits = 3)
+  if (p > alpha) p2 = paste0('p = ', p)
+  if (p < alpha) p2 = "p < 0.05"
+  if (p < 0.01) p2 = "p < 0.01"
+  if (p < 0.001) p2 = "p < 0.001"
+  if (p < 0.0001) p2 = "p < 0.0001"
+  
+  # legend("topleft", legend = p2, cex=2, bty = 'n')
+}
