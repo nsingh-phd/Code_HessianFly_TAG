@@ -43,13 +43,6 @@
 # print out hapgeno.orig colnames to see populations
   sort(colnames(hapgeno.orig))
 
-# function to parse out populations
-  parse_pop <- function(id=NULL, r.parent=NULL, s.parent=NULL) {
-    datf <- hapgeno.orig[, grep(paste(c(id, r.parent, s.parent), collapse = '|'), colnames(hapgeno.orig))]
-    rownames(datf) <- hap.orig$`rs#`
-    return(datf)
-  }
-
 # separate out the populations
   # h3 <- parse_pop('CN_', 'Carol', 'Newton')
   h5 <- parse_pop('EN_', 'Erin', 'Newton')
