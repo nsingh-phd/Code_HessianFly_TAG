@@ -63,8 +63,6 @@
   f.tests.AC.combined <- Reduce(f = function(dtf1, dtf2) merge(dtf1, dtf2, by = c('SNP', 'CHR', 'BP', 'CHRHomoeo'), all = T),
                                 x = mget(f.tests.AC))
   f.tests.AC.combined <- f.tests.AC.combined[order(f.tests.AC.combined$CHR, f.tests.AC.combined$BP), ]
-  # remove individual dataframes
-  rm(list = f.tests.AC)
   # create a pdf file to hold plots
   pdf('output/manhattan_plots.AC.pdf', height = 11, width = 8.5)
   # create some padding around the plots
