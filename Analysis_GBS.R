@@ -74,9 +74,9 @@
 ## Assiciation tests
 ## ##################
 
-  # Carol x Newton - H3
-  associationTest_GBS(dat = h3, res.parent = 'Carol', sus.parent = 'Newton')
-  # est.introgression(dat = , chrom = '')
+  # # Carol x Newton - H3
+  # associationTest_GBS(dat = h3, res.parent = 'Carol', sus.parent = 'Newton')
+  # est.introgression(dat = h3, chrom = '')
   
   # Erin x Newton - H5
   associationTest_GBS(dat = h5, res.parent = 'Erin', sus.parent = 'Newton')
@@ -86,9 +86,9 @@
   associationTest_GBS(dat = h6, res.parent = 'Flynn', sus.parent = 'Newton')
   est.introgression(dat = h6, chrom = '1A')
   
-  # Joy x Newton - H10
-  associationTest_GBS(dat = h10, res.parent = 'Joy', sus.parent = 'Newton')
-  est.introgression(dat = h10, chrom = '6D')
+  # # Joy x Newton - H10
+  # associationTest_GBS(dat = h10, res.parent = 'Joy', sus.parent = 'Newton')
+  # est.introgression(dat = h10, chrom = '6D')
   
   # Lola x Newton - H12
   associationTest_GBS(dat = h12, res.parent = 'Lola', sus.parent = 'Newton')
