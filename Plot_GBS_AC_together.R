@@ -3,15 +3,14 @@
 ## AC and GBS manhattan plots stacked ##
 ##################################### ##
 
-# remove 'S' from SNP name in f.tests.AC.combined
-  f.tests.AC.combined$SNP <- sub(pattern = '^S', replacement = '', f.tests.AC.combined$SNP)
 # combine f.tests.AC.combined and f.tests.GBS.combined and order by chr and snp position
   f.tests.combined <- merge(f.tests.GBS.combined, f.tests.AC.combined, by = c('SNP', 'CHR', 'BP', 'CHRHomoeo'), all = T)
   f.tests.combined <- f.tests.combined[order(f.tests.combined$CHR, f.tests.combined$BP), ]
 # replace x and y in colnames with gbs and AC
   colnames(f.tests.combined) <- sub(pattern = 'x$', replacement = 'gbs', colnames(f.tests.combined))
   colnames(f.tests.combined) <- sub(pattern = 'y$', replacement = 'AC', colnames(f.tests.combined))
-  colnames(f.tests.combined)[19:20] <- paste0(colnames(f.tests.combined)[19:20], '.AC')
+  renseq.cols <- grep('renseq', colnames(f.tests.combined))
+  colnames(f.tests.combined)[renseq.cols] <- paste0(colnames(f.tests.combined)[renseq.cols], '.AC')
 # sort chromosomes
   f.tests.combined <- f.tests.combined[, c(1:4, order(colnames(f.tests.combined)[-c(1:4)]) + 4)]
 # create a pdf file to hold plots
