@@ -18,6 +18,15 @@
   cols <- rep('black', length(chrNames))
   cols[grep('B', chrNames)] = 'red'
   cols[grep('D', chrNames)] = 'blue'
+
+## ################################# ##
+## function to parse out populations ##
+## ################################# ##
+parse_pop <- function(id=NULL, r.parent=NULL, s.parent=NULL) {
+  datf <- hapgeno.orig[, grep(paste(c(id, r.parent, s.parent), collapse = '|'), colnames(hapgeno.orig))]
+  rownames(datf) <- hap.orig$`rs#`
+  return(datf)
+}
   
 ## ################### ##
 ## Compute basic stats ##
