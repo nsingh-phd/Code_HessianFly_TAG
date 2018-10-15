@@ -34,7 +34,7 @@
   pdf(file="output/plant_color_field.pdf", width = 11, height = 5.5)
   par(mfrow=c(1,2))
   barplot(c(72,151,81), col = c('forestgreen', 'gray', 'green'), 
-          names.arg = c('Overley like', 'Segregating', 'Ae. tauschii like'), 
+          names.arg = c('Overley-like', 'Segregating', 'Ae. tauschii-like'), 
           cex.axis = 1.5, cex.names = 1.2,
           main = "Fam1 lines distribution for spike color")
 
@@ -44,7 +44,8 @@
   categData
   
   chisq.test(categData)
-  spineplot(categData, xaxlabels = c('Rr', 'RR', 'rr'), yaxlabels = c('Overley like', 'Segregating', 'Ae. tauschii like'),
+  spineplot(categData, xaxlabels = c('Rr', 'RR', 'rr'), 
+            yaxlabels = c('Overley-like', 'Segregating', 'Ae. tauschii like'),
             col = c('forestgreen', 'gray', 'green'), main = 'Color distribution within different genotypes')
   mtext(paste('Chi-sq p-val =', round(chisq.test(categData)$p.value, 3)), side = 3, cex = 1.25)
   
