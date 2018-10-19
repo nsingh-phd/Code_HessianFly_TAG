@@ -197,7 +197,7 @@ associationTest_GBS <- function(dat = NULL, res.parent = NULL, sus.parent = NULL
 ## Association Test Allele count ##
 ## ############################# ##
 
-associationTest_AC <- function(data = NULL, pop.id = NULL, gene = NULL, alpha = 0.001) {
+associationTest_BSA.gbs <- function(data = NULL, pop.id = NULL, gene = NULL, alpha = 0.001) {
   # create a dataset with population specific columns
     dat <- data[, c(1:4, grep(paste0(pop.id, '_'), colnames(data)))]
     dat <- dat[, c(1:4, order(colnames(dat)[-c(1:4)]) + 4)]
@@ -243,7 +243,7 @@ associationTest_AC <- function(data = NULL, pop.id = NULL, gene = NULL, alpha = 
         pVals$P <- as.numeric(pVals$P)
       
       ## plot
-        pdf(file = paste0('output/', gene, '.AC.QQ.Plot.pdf'), height = 6.5, width = 11)
+        pdf(file = paste0('output/', gene, '.BSA-gbs.QQ.Plot.pdf'), height = 6.5, width = 11)
         qq(pVals$P)
         dev.off()
         
@@ -252,7 +252,7 @@ associationTest_AC <- function(data = NULL, pop.id = NULL, gene = NULL, alpha = 
         cols[grep('B', chrNames)] = 'red'
         cols[grep('D', chrNames)] = 'blue'
         
-        pdf(file = paste0('output/', gene, '.AC.genomewide.pdf'), height = 6.5, width = 11)
+        pdf(file = paste0('output/', gene, '.BSA-gbs.genomewide.pdf'), height = 6.5, width = 11)
         manhattan(pVals, suggestiveline = F, genomewideline = -log10(alpha / nrow(pVals)), 
                   chrlabs = chrNames, col = cols, ylab='', xlab='')
         mtext('Chromosome', 1, line = 2.8, cex = 1.5)
@@ -261,7 +261,7 @@ associationTest_AC <- function(data = NULL, pop.id = NULL, gene = NULL, alpha = 
         dev.off()
         
       # assign pvalue dataframe to global variable
-        assign(paste0('f.test.AC.', gene), pVals, envir = .GlobalEnv)
+        assign(paste0('f.test.BSA-gbs.', gene), pVals, envir = .GlobalEnv)
 }
 
 ## ###################### ##
@@ -305,13 +305,13 @@ est.introgression <- function(dat = NULL, chrom = NULL, alpha = 0.001) {
 ## Plot Manhattan ##
 ## ############## ##
 
-plotManhattan <- function(dat = NULL) {
+plotManhattan <- function(dat = NULL, strategy = NULL) {
   manhattan(dat, p = colnames(dat)[i], suggestiveline = F, genomewideline = F,
             ylim = c(0, range(-log10(dat[, i]), na.rm = T)[2] + 2),
             chrlabs = chrNames, col = cols, ylab='', xlab='', cex = 1, cex.axis = 1.25)
   abline(h = -log10(alpha / sum(!is.na(dat[, i]))), lty = 3, col = 'red')
   mtext(text = '-log10(p)', 2, line = 2.7, cex = 1)
-  legend('topleft', legend = bquote(bold(.(toupper(paste0(colnames(dat)[i],'    '))))), cex = 1.25, bg = 'gray90')
+  legend('topleft', legend = bquote(bold(.(paste0(colnames(dat)[i], strategy, '    ')))), cex = 1.25, bg = 'gray90')
 }
 
 ## ################################ ##
@@ -320,7 +320,7 @@ plotManhattan <- function(dat = NULL) {
 
 plotManhattan_chrom <- function(dat = NULL, chrom = NULL, gene = NULL, legend.pos = NULL) {
   # subset the dataframe with specific population and specific chromosome
-    data <- dat[dat$CHRHomoeo == chrom, c(1:4, grep(gene, colnames(dat)))]
+    data <- dat[dat$CHRHomoeo == chrom, c(1:4, grep(gene, colnames(dat), ignore.case = T))]
   # set up ylim.max limit
     ylim.max = min(apply(data[, -c(1:4)], 2, function(p) max(-log10(na.omit(p)))))
   # plot manhattan
