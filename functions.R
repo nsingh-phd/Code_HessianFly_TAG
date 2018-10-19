@@ -197,7 +197,7 @@ associationTest_GBS <- function(dat = NULL, res.parent = NULL, sus.parent = NULL
 ## Association Test Allele count ##
 ## ############################# ##
 
-associationTest_BSA.gbs <- function(data = NULL, pop.id = NULL, gene = NULL, alpha = 0.001) {
+associationTest_BSA <- function(data = NULL, pop.id = NULL, gene = NULL, alpha = 0.001) {
   # create a dataset with population specific columns
     dat <- data[, c(1:4, grep(paste0(pop.id, '_'), colnames(data)))]
     dat <- dat[, c(1:4, order(colnames(dat)[-c(1:4)]) + 4)]
@@ -243,7 +243,7 @@ associationTest_BSA.gbs <- function(data = NULL, pop.id = NULL, gene = NULL, alp
         pVals$P <- as.numeric(pVals$P)
       
       ## plot
-        pdf(file = paste0('output/', gene, '.BSA-gbs.QQ.Plot.pdf'), height = 6.5, width = 11)
+        pdf(file = paste0('output/', gene, '.BSA.QQ.Plot.pdf'), height = 6.5, width = 11)
         qq(pVals$P)
         dev.off()
         
@@ -252,7 +252,7 @@ associationTest_BSA.gbs <- function(data = NULL, pop.id = NULL, gene = NULL, alp
         cols[grep('B', chrNames)] = 'red'
         cols[grep('D', chrNames)] = 'blue'
         
-        pdf(file = paste0('output/', gene, '.BSA-gbs.genomewide.pdf'), height = 6.5, width = 11)
+        pdf(file = paste0('output/', gene, '.BSA.genomewide.pdf'), height = 6.5, width = 11)
         manhattan(pVals, suggestiveline = F, genomewideline = -log10(alpha / nrow(pVals)), 
                   chrlabs = chrNames, col = cols, ylab='', xlab='')
         mtext('Chromosome', 1, line = 2.8, cex = 1.5)
@@ -261,7 +261,7 @@ associationTest_BSA.gbs <- function(data = NULL, pop.id = NULL, gene = NULL, alp
         dev.off()
         
       # assign pvalue dataframe to global variable
-        assign(paste0('f.test.BSA-gbs.', gene), pVals, envir = .GlobalEnv)
+        assign(paste0('f.test.BSA.', gene), pVals, envir = .GlobalEnv)
 }
 
 ## ###################### ##
@@ -328,15 +328,15 @@ plotManhattan_chrom <- function(dat = NULL, chrom = NULL, gene = NULL, legend.po
               ylab='', xlab='', cex = 1, cex.axis = 1, xaxt = 'n')
     abline(h = -log10(alpha / nrow(data)), lty = 3, col = 'red')
     axis(side = 1, at = seq(0, 900, 100) * 10^6, labels = seq(0, 900, 100))
-    mtext(text = '-log10(p)', 2, line = 2.7, cex = 1)
-    mtext(text = paste0('Chromosome ', chrom, ' (Mb)'), side = 1, line = 3, cex = 1)
+    mtext(text = '-log10(p)', 2, line = 2.5, cex = 1.25)
+    mtext(text = paste0('Chromosome ', chrom, ' (Mb)'), side = 1, line = 2.5, cex = 1.25)
 
     for (i in 6:ncol(data)) {
-      points(data$BP, -log10(data[, i]), col = i-4)
+      points(data$BP, -log10(data[, i]), col = i-4, cex = 0.75, pch = 16)
     }
     
-    legend(legend.pos, legend = toupper(paste0(colnames(data)[-c(1:4)],'    ')), 
-           pch = c(16,1,1,1), col = c(1,2,3,4), cex = 0.75)
+    legend(legend.pos, legend = paste0(colnames(data)[-c(1:4)],'    '), 
+           pch = c(16), col = c(1,2,3,4), cex = 1)
 }
 
 ## ############### ##

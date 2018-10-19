@@ -169,58 +169,57 @@
 ##
   
   # Erin x Newton - H5
-    associationTest_BSA.gbs(data = alleleCounts, pop.id = 'EN', gene = 'H5-EN')
+    associationTest_BSA(data = alleleCounts, pop.id = 'EN', gene = 'H5-EN')
   
   # Flynn x Newton - H6
-    associationTest_BSA.gbs(data = alleleCounts, pop.id = 'FN', gene = 'H6-FN')
+    associationTest_BSA(data = alleleCounts, pop.id = 'FN', gene = 'H6-FN')
   
   # Lola x Newton - H12
-    associationTest_BSA.gbs(data = alleleCounts, pop.id = 'LN', gene = 'H12-LN')
+    associationTest_BSA(data = alleleCounts, pop.id = 'LN', gene = 'H12-LN')
   
   # Molly x Newton - H13
-    associationTest_BSA.gbs(data = alleleCounts, pop.id = 'MN', gene = 'H13-MN')
+    associationTest_BSA(data = alleleCounts, pop.id = 'MN', gene = 'H13-MN')
   
   # Molly x Overley - H13
-    associationTest_BSA.gbs(data = alleleCounts, pop.id = 'MO', gene = 'H13-MO')
+    associationTest_BSA(data = alleleCounts, pop.id = 'MO', gene = 'H13-MO')
   
   ## Gene H26 families
     # KU2147 x Overley - H26
-      associationTest_BSA.gbs(data = alleleCounts, pop.id = 'KO', gene = 'H26-Fam1')
+      associationTest_BSA(data = alleleCounts, pop.id = 'KO', gene = 'H26-Fam1')
     # RenSeq Tv2 Family 1 - KU2147 x Overley - H26
-      associationTest_BSA.gbs(data = alleleCounts_RenSeq_Tv2, pop.id = 'fam_1', gene = 'H26-Fam1_RenSeq')
+      associationTest_BSA(data = alleleCounts_RenSeq_Tv2, pop.id = 'fam_1', gene = 'H26-Fam1_RenSeq')
     # RenSeq Tv2 Family 2 - KU2147 x Overley - H26
-      associationTest_BSA.gbs(data = alleleCounts_RenSeq_Tv2, pop.id = 'fam_2', gene = 'H26-Fam2_RenSeq')
+      associationTest_BSA(data = alleleCounts_RenSeq_Tv2, pop.id = 'fam_2', gene = 'H26-Fam2_RenSeq')
   
   # SynOP DH - H32
-    associationTest_BSA.gbs(data = alleleCounts, pop.id = 'SynOp', gene = 'H32-SynOpDH')
+    associationTest_BSA(data = alleleCounts, pop.id = 'SynOp', gene = 'H32-SynOpDH')
 
 ##
 ## Manhattan plots in one file
 ##
 
   # get list of data frames to merge
-    f.tests.BSA.gbs <- ls(pattern = 'f.test.BSA-gbs')
+    f.tests.BSA <- ls(pattern = 'f.test.BSA')
   # change P values colname to gene to aviod conflict
-    for (i in 1:length(f.tests.BSA.gbs)) {
-      dat <- get(f.tests.BSA.gbs[i])
-      colnames(dat)[2] <- substring(text = f.tests.BSA.gbs[i], first = 16)
-      assign(paste0(f.tests.BSA.gbs[i]), dat, envir = .GlobalEnv)
+    for (i in 1:length(f.tests.BSA)) {
+      dat <- get(f.tests.BSA[i])
+      colnames(dat)[2] <- substring(text = f.tests.BSA[i], first = 12)
+      assign(paste0(f.tests.BSA[i]), dat, envir = .GlobalEnv)
     }
   # merge all data frames and order based on chromosome and SNP positions
-    f.tests.BSA.gbs.combined <- Reduce(f = function(dtf1, dtf2) merge(dtf1, dtf2, by = c('SNP', 'CHR', 'BP', 'CHRHomoeo'), all = T),
-                                  x = mget(f.tests.BSA.gbs))
-    f.tests.BSA.gbs.combined <- f.tests.BSA.gbs.combined[order(f.tests.BSA.gbs.combined$CHR, f.tests.BSA.gbs.combined$BP), ]
-    colnames(f.tests.BSA.gbs.combined)[-c(1:4)] <- sub(pattern = '$', replacement = '_BSA-gbs', 
-                                                       colnames(f.tests.BSA.gbs.combined)[-c(1:4)])
-    colnames(f.tests.BSA.gbs.combined) <- sub(pattern = '_RenSeq_BSA-gbs$', replacement = '_RenSeq', colnames(f.tests.BSA.gbs.combined))
+    f.tests.BSA.combined <- Reduce(f = function(dtf1, dtf2) merge(dtf1, dtf2, by = c('SNP', 'CHR', 'BP', 'CHRHomoeo'), all = T),
+                                  x = mget(f.tests.BSA))
+    f.tests.BSA.combined <- f.tests.BSA.combined[order(f.tests.BSA.combined$CHR, f.tests.BSA.combined$BP), ]
+    colnames(f.tests.BSA.combined)[-c(1:4)] <- sub(pattern = '$', replacement = '_BSA', 
+                                                       colnames(f.tests.BSA.combined)[-c(1:4)])
   # create a pdf file to hold plots
-    pdf('output/GWAS_BSA-gbs_RenSeq.pdf', height = 11, width = 8.5)
+    pdf('output/GWAS_BSA.pdf', height = 11, width = 8.5)
     # create some padding around the plots
     par(mfrow=c(4,1), oma = c(2, 4, 1, 1), mar = c(3.5, 0, 0, 0)) 
   
   # plot manhattan plot
-    for (i in 5:ncol(f.tests.BSA.gbs.combined)) {
-      plotManhattan(dat = f.tests.BSA.gbs.combined)
+    for (i in 5:ncol(f.tests.BSA.combined)) {
+      plotManhattan(dat = f.tests.BSA.combined)
     }
     dev.off()
 
@@ -229,13 +228,13 @@
 ## AC and GBS manhattan plots stacked ##
 ##################################### ##
 
-# combine f.tests.BSA.gbs.combined and f.tests.GBS.combined and order by chr and snp position
-  f.tests.combined <- merge(f.tests.GBS.combined, f.tests.BSA.gbs.combined, by = c('SNP', 'CHR', 'BP', 'CHRHomoeo'), all = T)
+# combine f.tests.BSA.combined and f.tests.GBS.combined and order by chr and snp position
+  f.tests.combined <- merge(f.tests.GBS.combined, f.tests.BSA.combined, by = c('SNP', 'CHR', 'BP', 'CHRHomoeo'), all = T)
   f.tests.combined <- f.tests.combined[order(f.tests.combined$CHR, f.tests.combined$BP), ]
 # sort chromosomes
   f.tests.combined <- f.tests.combined[, c(1:4, order(colnames(f.tests.combined)[-c(1:4)]) + 4)]
 # create a pdf file to hold plots
-  pdf('output/GWAS_GBS_BSA-gbs_RenSeq.pdf', height = 11, width = 8.5)
+  pdf('output/GWAS_GBS_BSA_Combined.pdf', height = 11, width = 8.5)
   # create some padding around the plots
   par(mfrow=c(4,1), oma = c(2, 4, 1, 1), mar = c(3.5, 0, 0, 0)) 
   # plot manhattan plot
@@ -249,9 +248,9 @@
 ## Single chrom manhattan plots ##
 ## ############################ ##
 
-  pdf('output/H13_H26_combined.pdf', width = 8.5, height = 7)
+  pdf('output/Combined_H13_H26.pdf', width = 8.5, height = 7)
   # create some padding around the plots
-  par(mfrow=c(2,1), oma = c(2, 4, 1, 1), mar = c(3.5, 0, 0, 0)) 
+  par(mfrow=c(2,1), oma = c(2, 4, 1, 1), mar = c(3.5, 0, 0, 0))
   plotManhattan_chrom(dat = f.tests.combined, chrom = "6D", gene = "H13", legend.pos = 'topright')
   plotManhattan_chrom(dat = f.tests.combined, chrom = "3D", gene = "H26", legend.pos = 'topleft')
   dev.off()
