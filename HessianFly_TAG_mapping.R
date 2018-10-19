@@ -8,7 +8,7 @@
 ## ###########################
 
 # load required functions
-  source("functions.R")
+  source("HessianFly_TAG_functions.R")
   
 # read hapfile
   hap.orig <- fread("data/HessianFly_TAG.hmp.txt", header = T, check.names = F, stringsAsFactors = F, data.table = F)
