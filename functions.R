@@ -202,8 +202,9 @@ associationTest_AC <- function(data = NULL, pop.id = NULL, gene = NULL, alpha = 
     dat <- data[, c(1:4, grep(paste0(pop.id, '_'), colnames(data)))]
     dat <- dat[, c(1:4, order(colnames(dat)[-c(1:4)]) + 4)]
     dat <- dat[grep('UN', dat$CHR, ignore.case = T, invert = T), ]
-  # remove SNPs if total missing data and each allele count is less than 3
-    dat <- dat[complete.cases(dat) & rowSums(dat[, 5:8] >= 1) == 4, ]
+  # remove SNPs if total missing data and each allele count is less than 1
+    dat <- dat[complete.cases(dat) & rowSums(dat[, 5:6]) >= 10 & rowSums(dat[, 7:8]) >= 10, ]
+    
   # create a data frame to store p.values
     pVals <- as.matrix(data.frame('SNP' = paste0(dat$CHR, '_', dat$POS), 'P' = NA,
                                   'CHR' = dat$CHR, 'BP' = dat$POS, stringsAsFactors = F))
@@ -211,11 +212,16 @@ associationTest_AC <- function(data = NULL, pop.id = NULL, gene = NULL, alpha = 
     for (i in 1:nrow(dat)) {
       counts = matrix(data = as.numeric(dat[i, 5:8]), nrow = 2, ncol = 2)
       if (T
+          # remove if both alleles counts within bulk are equal
+            & counts[1, 1] != counts[2, 1] & counts[1, 2] != counts[2, 2]
           # keep snps with higher count of alt in res and ref in sus
             & which.max(counts[, 1]) == 1 & which.max(counts[, 2]) == 2
-          # kepp snps with ratio of max / min is greater than 1.25
-            & (max(counts[, 1]) / min(counts[, 1])) >= 1.25
-            & (max(counts[, 2]) / min(counts[, 2])) >= 1.25) {
+          # compute ratio of each allele state (ref and alt) across R and S bulk
+          # example alt count in R bulk / alt count in S bulk and same for the ref allele
+          # kepp snps with ratio of max / min is greater than or equal to 2
+            & (max(counts[1, ]) / min(counts[1, ])) >= 2
+            & (max(counts[2, ]) / min(counts[2, ])) >= 2
+          ) {
               # perform fisher test and assign pvalue to dataframe
                 test <- fisher.test(counts)
                 pVals[i, 2] <- test$p.value
@@ -365,14 +371,22 @@ alleleMatching <- function(allele.match = NULL) {
 ## Pheno plots ##
 ## ########### ##
 
-phenoPlots <- function(values = NULL, name = NULL, alpha = 0.05) {
-  chiTest <- chisq.test(values, p = c(0.25, 0.5, 0.25))
+# barplots for HF and plant color data
+phenoPlots <- function(values = NULL, name = NULL, alpha = 0.05, seg = NULL, trait = NULL) {
+  if (seg == '1:2:1') (chiTest <- chisq.test(values, p = c(0.25, 0.5, 0.25)))
+  if (seg == '1:1') (chiTest <- chisq.test(values[-2], p = c(0.5, 0.5)))
   midpoints <- barplot(values, plot = F)
-  barplot(values, col = c("darkgreen","yellow","red"), ylab = "Number of lines", 
+  if(trait == 'HF') {cols <- c("forestgreen","orange","tomato")
+                     xlabs = c("RR", "Rr", "rr")}
+  if(trait == 'plant_color') {cols <- c('forestgreen', 'gray', 'green')
+                              xlabs = c("'Overley'-like", 'Het', 'Ae. tauschii like')}
+  barplot(values, col = cols, ylab = "", 
           cex.names = 1.5, cex.axis = 1.5, cex.lab = 1.5,
-          main = name,
-          cex.main = 2, names.arg = c("RR", "Rr", "rr"))
-  text(midpoints, values - 10, labels = values, cex = 1.5)
+          main = name, ylim = c(0, max(values) + 10),
+          cex.main = 2, names.arg = xlabs)
+  mtext(text = "Number of lines", side = 2, line = 2.5)
+  if (seg == '1:2:1') text(midpoints, values - values/2, labels = values, cex = 1.5)
+  if (seg == '1:1') text(midpoints[-2], values[-2] - values[-2]/2, labels = values[-2], cex = 1.5)
   
   p = round(chiTest$p.value, digits = 3)
   if (p > alpha) p2 = paste0('p = ', p)
@@ -381,5 +395,26 @@ phenoPlots <- function(values = NULL, name = NULL, alpha = 0.05) {
   if (p < 0.001) p2 = "p < 0.001"
   if (p < 0.0001) p2 = "p < 0.0001"
   
-  # legend("topleft", legend = p2, cex=2, bty = 'n')
+  legend('topleft', legend = p2, cex = 1.25, bg = 'lightgray', bty = 'o')
+}
+
+# function to plot bar plots for agronomic data
+trait.plot <- function(data = NULL, trait = NULL, trait.name = NULL, plot = NULL) {
+  # get mean and std deviation for the trait
+    trait.val = data[, grep(trait, colnames(data), ignore.case = T)]
+    mean.trait = tapply(as.numeric(trait.val), data$res_sus, mean, na.rm = T)
+    sd.trait = tapply(as.numeric(trait.val), data$res_sus, sd, na.rm = T)
+  # barplot
+    if (plot == 'barplot') {
+      bar.trait <- barplot(mean.trait, ylim = c(0, max(as.numeric(trait.val))), xlim = c(0, 30),
+                           names.arg = c('RR', 'rr', "'Overley'"), width = 8, space = 0.1,
+                           ylab = trait.name, cex.axis = 1.25, cex.names = 1.25, cex.lab = 1.25)
+      arrows(bar.trait, mean.trait + sd.trait, bar.trait, mean.trait - sd.trait,
+             col = 2, code = 3, length = 0.1, angle = 90)
+    }
+  # histogram
+    if (plot == 'hist') {
+      hist(as.numeric(trait.val), xlab = trait.name, breaks = 15,
+           main = '', ylab = '# lines', cex.lab = 1.25)
+    }
 }
