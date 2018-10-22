@@ -79,33 +79,29 @@
 ##
   
   # Erin x Newton - H5
-  associationTest_GBS(dat = `H5-EN`, res.parent = 'Erin', sus.parent = 'Newton')
-  est.introgression(dat = `H5-EN`, chrom = '6B')
-  
+    associationTest_GBS(dat = `H5-EN`, res.parent = 'Erin', sus.parent = 'Newton', miss = 0.2)
   # Flynn x Newton - H6
-  associationTest_GBS(dat = `H6-FN`, res.parent = 'Flynn', sus.parent = 'Newton')
-  est.introgression(dat = `H6-FN`, chrom = '1A')
-  
+    associationTest_GBS(dat = `H6-FN`, res.parent = 'Flynn', sus.parent = 'Newton', miss = 0.2)
   # Lola x Newton - H12
-  associationTest_GBS(dat = `H12-LN`, res.parent = 'Lola', sus.parent = 'Newton')
-  est.introgression(dat = `H12-LN`, chrom = '3B')
-  
+    associationTest_GBS(dat = `H12-LN`, res.parent = 'Lola', sus.parent = 'Newton', miss = 0.2)
   # Molly x Newton - H13
-  associationTest_GBS(dat = `H13-MN`, res.parent = 'Molly', sus.parent = 'Newton')
-  est.introgression(dat = `H13-MN`, chrom = '6D')
-  
+    associationTest_GBS(dat = `H13-MN`, res.parent = 'Molly', sus.parent = 'Newton', miss = 0.2)
   # Molly x Overley - H13
-  associationTest_GBS(dat = `H13-MO`, res.parent = 'Molly', sus.parent = 'Overley')
-  est.introgression(dat = `H13-MO`, chrom = '6D')
-  
+    associationTest_GBS(dat = `H13-MO`, res.parent = 'Molly', sus.parent = 'Overley', miss = 0.2)
   # KU2147 x Overley - H26
-  associationTest_GBS(dat = `H26-Fam1`, res.parent = 'KU2147', sus.parent = 'Overley', miss = 0.5)
-  est.introgression(dat = `H26-Fam1`, chrom = '3D')
-  
+    associationTest_GBS(dat = `H26-Fam1`, res.parent = 'KU2147', sus.parent = 'Overley', miss = 0.4)
   # SynOP DH - H32
-  associationTest_GBS(dat = `H32-SynOpDH`, res.parent = 'SyntheticW7984', sus.parent = 'OpataM85')
-  est.introgression(dat = `H32-SynOpDH`, chrom = '3D')
+    associationTest_GBS(dat = `H32-SynOpDH`, res.parent = 'SyntheticW7984', sus.parent = 'OpataM85', miss = 0.2)
   
+  # estimate introgression size  
+    est.introgression(pop.code = `H5-EN`, chrom = '6B', strategy = 'GBS')
+    est.introgression(pop.code = `H6-FN`, chrom = '1A', strategy = 'GBS')
+    est.introgression(pop.code = `H12-LN`, chrom = '3B', strategy = 'GBS')
+    est.introgression(pop.code = `H13-MN`, chrom = '6D', strategy = 'GBS')
+    est.introgression(pop.code = `H13-MO`, chrom = '6D', strategy = 'GBS')
+    est.introgression(pop.code = `H26-Fam1`, chrom = '3D', strategy = 'GBS')
+    est.introgression(pop.code = `H32-SynOpDH`, chrom = '3D', strategy = 'GBS')
+
 ##
 ## Manhattan plots in one file
 ##
@@ -124,9 +120,9 @@
   f.tests.GBS.combined <- f.tests.GBS.combined[order(f.tests.GBS.combined$CHR, f.tests.GBS.combined$BP), ]
   colnames(f.tests.GBS.combined)[-c(1:4)] <- sub(pattern = '$', replacement = '_GBS', colnames(f.tests.GBS.combined)[-c(1:4)])
   # create a pdf file for plotting
-  pdf('output/GWAS_GBS.pdf', height = 11, width = 8.5)
+  pdf('output/Fig.S3_GWAS_GBS.pdf', height = 11, width = 7)
   # create some padding around the plots
-  par(mfrow=c(4,1), oma = c(2, 4, 1, 1), mar = c(3.5, 0, 0, 0)) 
+  par(mfrow=c(7,1), oma = c(2, 4, 1, 1), mar = c(2.75, 0, 0, 0)) 
   # plot manhattan plot
   for (i in 5:ncol(f.tests.GBS.combined)) {
     plotManhattan(dat = f.tests.GBS.combined)
@@ -170,30 +166,35 @@
   
   # Erin x Newton - H5
     associationTest_BSA(data = alleleCounts, pop.id = 'EN', gene = 'H5-EN')
-  
   # Flynn x Newton - H6
     associationTest_BSA(data = alleleCounts, pop.id = 'FN', gene = 'H6-FN')
-  
   # Lola x Newton - H12
     associationTest_BSA(data = alleleCounts, pop.id = 'LN', gene = 'H12-LN')
-  
   # Molly x Newton - H13
     associationTest_BSA(data = alleleCounts, pop.id = 'MN', gene = 'H13-MN')
-  
   # Molly x Overley - H13
     associationTest_BSA(data = alleleCounts, pop.id = 'MO', gene = 'H13-MO')
-  
   ## Gene H26 families
     # KU2147 x Overley - H26
       associationTest_BSA(data = alleleCounts, pop.id = 'KO', gene = 'H26-Fam1')
-    # RenSeq Tv2 Family 1 - KU2147 x Overley - H26
+      # RenSeq Tv2 Family 1 - KU2147 x Overley - H26
       associationTest_BSA(data = alleleCounts_RenSeq_Tv2, pop.id = 'fam_1', gene = 'H26-Fam1_RenSeq')
-    # RenSeq Tv2 Family 2 - KU2147 x Overley - H26
+      # RenSeq Tv2 Family 2 - KU2147 x Overley - H26
       associationTest_BSA(data = alleleCounts_RenSeq_Tv2, pop.id = 'fam_2', gene = 'H26-Fam2_RenSeq')
-  
   # SynOP DH - H32
     associationTest_BSA(data = alleleCounts, pop.id = 'SynOp', gene = 'H32-SynOpDH')
-
+    
+  # estimate introgression size  
+    est.introgression(pop.code = `H5-EN`, chrom = '6B', strategy = 'BSA')
+    est.introgression(pop.code = `H6-FN`, chrom = '1A', strategy = 'BSA')
+    est.introgression(pop.code = `H12-LN`, chrom = '3B', strategy = 'BSA')
+    est.introgression(pop.code = `H13-MN`, chrom = '6D', strategy = 'BSA')
+    est.introgression(pop.code = `H13-MO`, chrom = '6D', strategy = 'BSA')
+    est.introgression(pop.code = `H26-Fam1`, chrom = '3D', strategy = 'BSA')
+    est.introgression(pop.code = `H26-Fam1_RenSeq`, chrom = '3D', strategy = 'BSA')
+    est.introgression(pop.code = `H26-Fam2_RenSeq`, chrom = '3D', strategy = 'BSA')
+    est.introgression(pop.code = `H32-SynOpDH`, chrom = '3D', strategy = 'BSA')
+    
 ##
 ## Manhattan plots in one file
 ##
@@ -210,20 +211,38 @@
     f.tests.BSA.combined <- Reduce(f = function(dtf1, dtf2) merge(dtf1, dtf2, by = c('SNP', 'CHR', 'BP', 'CHRHomoeo'), all = T),
                                   x = mget(f.tests.BSA))
     f.tests.BSA.combined <- f.tests.BSA.combined[order(f.tests.BSA.combined$CHR, f.tests.BSA.combined$BP), ]
-    colnames(f.tests.BSA.combined)[-c(1:4)] <- sub(pattern = '$', replacement = '_BSA', 
+    colnames(f.tests.BSA.combined)[-c(1:4)] <- sub(pattern = '$', replacement = '_BSA-GBS', 
                                                        colnames(f.tests.BSA.combined)[-c(1:4)])
+    colnames(f.tests.BSA.combined) <- sub(pattern = '_RenSeq_BSA-GBS', replacement = '_BSA-RenSeq', colnames(f.tests.BSA.combined))
+    f.tests.BSA.combined.no.renseq <- f.tests.BSA.combined[, grep('RenSeq', colnames(f.tests.BSA.combined), invert = T)]
   # create a pdf file to hold plots
-    pdf('output/GWAS_BSA.pdf', height = 11, width = 8.5)
+    pdf('output/Fig.S4_GWAS_BSA.pdf', height = 11, width = 7)
     # create some padding around the plots
-    par(mfrow=c(4,1), oma = c(2, 4, 1, 1), mar = c(3.5, 0, 0, 0)) 
-  
+    par(mfrow=c(7,1), oma = c(2, 4, 1, 1), mar = c(2.75, 0, 0, 0)) 
   # plot manhattan plot
-    for (i in 5:ncol(f.tests.BSA.combined)) {
-      plotManhattan(dat = f.tests.BSA.combined)
+    for (i in 5:ncol(f.tests.BSA.combined.no.renseq)) {
+      plotManhattan(dat = f.tests.BSA.combined.no.renseq)
     }
     dev.off()
 
 
+##
+## RenSeq manhattan plots
+##
+    # take renseq samples out in a separate data.frame
+    f.tests.BSA.renseq.only <- f.tests.BSA.combined[, c(1:4, grep('RenSeq', colnames(f.tests.BSA.combined)))]
+    # update colnames
+    colnames(f.tests.BSA.renseq.only) <- sub(pattern = '_BSA-RenSeq', replacement = '', colnames(f.tests.BSA.renseq.only))
+    # create a pdf file to hold plots
+    pdf('output/Fig.5_GWAS_RenSeq_H26.pdf', height = 6, width = 7)
+    # create some padding around the plots
+    par(mfrow=c(2,1), oma = c(2, 4, 1, 1), mar = c(2.75, 0, 0, 0)) 
+    # plot manhattan plot
+    for (i in 5:ncol(f.tests.BSA.renseq.only)) {
+      plotManhattan(dat = f.tests.BSA.renseq.only)
+    }
+    dev.off()
+    
 ##################################### ##
 ## AC and GBS manhattan plots stacked ##
 ##################################### ##
@@ -234,9 +253,9 @@
 # sort chromosomes
   f.tests.combined <- f.tests.combined[, c(1:4, order(colnames(f.tests.combined)[-c(1:4)]) + 4)]
 # create a pdf file to hold plots
-  pdf('output/GWAS_GBS_BSA_Combined.pdf', height = 11, width = 8.5)
+  pdf('output/GWAS_GBS_BSA_Combined.pdf', height = 11, width = 7)
   # create some padding around the plots
-  par(mfrow=c(4,1), oma = c(2, 4, 1, 1), mar = c(3.5, 0, 0, 0)) 
+  par(mfrow=c(8,1), oma = c(2, 4, 1, 1), mar = c(2.75, 0, 0, 0)) 
   # plot manhattan plot
   for (i in 5:ncol(f.tests.combined)) {
     plotManhattan(dat = f.tests.combined)
@@ -244,15 +263,66 @@
   dev.off()  
 
 
+## ###################################################### ##
+## Combine both strategies and plot single manhattan plot ##
+## ###################################################### ##
+  
+  bsa.gbs.only <- f.tests.combined[, grep('renseq', colnames(f.tests.combined), ignore.case = T, invert = T)]
+  pop.gene.chrom <- data.frame('pop.code' = c('H5-EN', 'H6-FN', 'H12-LN', 'H13-MN', 'H13-MO', 'H26-Fam1', 'H32-SynOpDH'),
+                               'gene' = c('H5', 'H6', 'H12', 'H13', 'H13', 'H26', 'H32'),
+                               'chrom' = c('6B', '1A', '3B', '6D', '6D', '3D', '3D'), stringsAsFactors = F)
+  # data frame to combine p values from both strategies
+  bsa.gbs.combined.p <- data.frame(bsa.gbs.only[, 1:4], 'H5-EN'=NA, 'H6-FN'=NA, 'H12-LN'=NA, 'H13-MN'=NA, 
+                                   'H13-MO'=NA, 'H26-Fam1'=NA, 'H32-SynOpDH'=NA, check.names = F, stringsAsFactors = F)
+  # pdf file
+    pdf('output/Fig.3_GWAS_SigSNPs.pdf', height = 11, width = 7)
+  # create some padding around the plots
+    par(mfrow=c(7,1), oma = c(2, 4, 1, 1), mar = c(2.75, 0, 0, 0)) 
+  # plot manhattan
+    for (i in 1:nrow(pop.gene.chrom)) {
+    # data frame for specific population columns
+      dat <- bsa.gbs.only[, c(1:4, grep(pop.gene.chrom$pop.code[i], colnames(bsa.gbs.only), ignore.case = T))]
+    # bonf threshold for each strategy 
+      bon.thresh.gbs = alpha / nrow(get(paste0('f.test.GBS.', pop.gene.chrom$pop.code[i])))
+      bon.thresh.bsa = alpha / nrow(get(paste0('f.test.BSA.', pop.gene.chrom$pop.code[i])))
+    # keep only those snps that are significant in both
+      sig.in.both <- (dat[, grep('_BSA-GBS', colnames(dat))] <= bon.thresh.bsa) & 
+                     (dat[, grep('_GBS', colnames(dat))] <= bon.thresh.gbs)
+    # get the mean of pvals from both strategies
+      dat$P = rowMeans(dat[, -c(1:4)])
+    # replace non-significant snps to NA
+      dat$P[!sig.in.both] = 1
+    # append dat to bsa.gbs.combined.p
+      bsa.gbs.combined.p[, i+4] <- dat$P
+    # set up ylim.max limit
+      ylim.max = max(-log10(na.omit(dat$P))) + 3
+    # plot manhattan
+      manhattan(x = dat, ylim = c(0, ylim.max), suggestiveline = F, genomewideline = F,
+                chrlabs = chrNames, col = cols, xlab = '', ylab = '')
+      abline(h = -log10(mean(bon.thresh.bsa, bon.thresh.gbs)), lty = 3, col = 'red')
+      mtext(text = '-log10(p)', 2, line = 2.7, cex = 1)
+      legend('topright', legend = bquote(bold(.(paste0(pop.gene.chrom$pop.code[i], '    ')))), cex = 1, bg = 'gray90')
+      if (i == 1) (legend('topleft', legend = paste0(c('A', 'B', 'D'), ' sub-genome'), 
+                          pch = c(16), col = c('black', 'red', 'blue'), cex = 1.25))
+    }
+    dev.off()
+
+##
+## Estimate introgressions sizes
+##
+    
+  
 ## ############################ ##
 ## Single chrom manhattan plots ##
 ## ############################ ##
 
-  pdf('output/Combined_H13_H26.pdf', width = 8.5, height = 7)
+  pdf('output/Fig.4_Combined_H13_H26.pdf', height = 7, width = 8.5)
   # create some padding around the plots
-  par(mfrow=c(2,1), oma = c(2, 4, 1, 1), mar = c(3.5, 0, 0, 0))
-  plotManhattan_chrom(dat = f.tests.combined, chrom = "6D", gene = "H13", legend.pos = 'topright')
-  plotManhattan_chrom(dat = f.tests.combined, chrom = "3D", gene = "H26", legend.pos = 'topleft')
+  par(mfrow=c(2,1), oma = c(1, 4, 2, 1), mar = c(4, 0, 0, 0))
+  # plot H13
+  plotManhattan_chrom(dat = f.tests.combined, chrom = "6D", gene = "H13", legend.pos = 'topright', col.density = 0.4)
+  # plot H26 and H32
+  plotManhattan_chrom(dat = f.tests.combined, chrom = "3D", gene = c("H26", "H32"), legend.pos = 'topleft', col.density = 0.4)
   dev.off()
 
 ## ### ##
