@@ -5,7 +5,7 @@
 
 ## load packages
   if(!require(pacman)) install.packages(pacman); require(pacman)
-  p_load(data.table, qqman, reshape, dplyr)
+  p_load(data.table, qqman, reshape, dplyr, ggplot2)
 
 ## default alpha
   alpha = 0.001
@@ -59,6 +59,7 @@ basic.stats <- function(hap = x) {
     cat('Computing missing data...')
     hap$missing = rowSums(is.na(hap[, 12:ncol(hap)]), na.rm = T) # compute per SNP missing data
     hap$propmiss = hap$missing/(ncol(hap)-11)
+    cat('Missing data range:', range(hap$propmiss))
     cat('Done.')
   return(hap)
 }
@@ -203,7 +204,9 @@ associationTest_BSA <- function(data = NULL, pop.id = NULL, gene = NULL, alpha =
     dat <- dat[, c(1:4, order(colnames(dat)[-c(1:4)]) + 4)]
     dat <- dat[grep('UN', dat$CHR, ignore.case = T, invert = T), ]
   # remove SNPs if total missing data and each allele count is less than 1
-    dat <- dat[complete.cases(dat) & rowSums(dat[, 5:6]) >= 10 & rowSums(dat[, 7:8]) >= 10, ]
+    dat <- dat[complete.cases(dat) & rowSums(dat[, 5:6] == 0) < 2 & rowSums(dat[, 7:8] == 0) < 2, ]
+      cat('# Total SNPs:', nrow(dat)); cat('\n')
+    dat <- dat[rowSums(dat[, 5:6]) >= 10 & rowSums(dat[, 7:8]) >= 10, ]
     
   # create a data frame to store p.values
     pVals <- as.matrix(data.frame('SNP' = paste0(dat$CHR, '_', dat$POS), 'P' = NA,
@@ -229,7 +232,7 @@ associationTest_BSA <- function(data = NULL, pop.id = NULL, gene = NULL, alpha =
       }
       # convert to data frame and remove snps with no pvalue
         pVals <- as.data.frame(pVals, stringsAsFactors = F)
-        pVals <- pVals[complete.cases(pVals), ]
+        pVals <- pVals[complete.cases(pVals), ]; cat('# Filtered SNPs:', nrow(pVals)); cat('\n')
       # change chrom from text to numeric
         pVals$CHRHomoeo <- pVals$CHR
           for (i in 1:7) {
@@ -268,10 +271,10 @@ associationTest_BSA <- function(data = NULL, pop.id = NULL, gene = NULL, alpha =
 ## Estimate introgression ##
 ## ###################### ##
 
-est.introgression <- function(dat = NULL, chrom = NULL, alpha = 0.001) {
-  # assign a particular f.test data to dat variable
-  pop.id <- deparse(substitute(dat))
-  assign('dat', get(paste0('f.test.GBS.', pop.id)))
+est.introgression <- function(pop.code = NULL, chrom = NULL, strategy = NULL, alpha = 0.001) {
+  # assign a particular f.test data to pop.code variable
+  pop.id <- deparse(substitute(pop.code))
+  assign('pop.code', get(paste0('f.test.', strategy, '.', pop.id)))
   
   # chrom to numeric
   chrom.name <- chrom
@@ -280,10 +283,10 @@ est.introgression <- function(dat = NULL, chrom = NULL, alpha = 0.001) {
   cent <- chrom.info$centromere[chrom.info$chrom_num == chrom] * 10^6
 
   # get chrom specific snps
-  chr_snps <- dat[dat$CHR == chrom, ]
+  chr_snps <- pop.code[pop.code$CHR == chrom, ]
   
-  pdf(file = paste0('output/', pop.id, '.GBS.introgression.pdf'), height = 6.5, width = 11)
-  manhattan(chr_snps, suggestiveline = F, genomewideline = -log10(alpha/nrow(dat)), 
+  pdf(file = paste0('output/', pop.id, '.', strategy, '.introgression.pdf'), height = 6.5, width = 11)
+  manhattan(chr_snps, suggestiveline = F, genomewideline = -log10(alpha/nrow(pop.code)), 
             cex.lab = 1, xlab = '', ylab = '', xaxt = 'n')
   axis(side = 1, at = seq(0, 900, 100) * 10^6, labels = seq(0, 900, 100))
   mtext(text = '-log10(p)', side = 2, line = 2.5, cex = 1.25)
@@ -292,7 +295,7 @@ est.introgression <- function(dat = NULL, chrom = NULL, alpha = 0.001) {
   points(x = cent, y = 0, pch = '|', cex = 3, col = 'blue') # plot centromere
 
   # calculate possible introgression size
-  introgression <- chr_snps[-log10(chr_snps$P) > -log10(alpha/nrow(dat)), ]
+  introgression <- chr_snps[-log10(chr_snps$P) > -log10(alpha/nrow(pop.code)), ]
   introgressionSize <- range(introgression$BP)[2] - range(introgression$BP)[1]
   introgressionRange <- range(introgression$BP) / 10^6
   
@@ -308,35 +311,34 @@ est.introgression <- function(dat = NULL, chrom = NULL, alpha = 0.001) {
 plotManhattan <- function(dat = NULL, strategy = NULL) {
   manhattan(dat, p = colnames(dat)[i], suggestiveline = F, genomewideline = F,
             ylim = c(0, range(-log10(dat[, i]), na.rm = T)[2] + 2),
-            chrlabs = chrNames, col = cols, ylab='', xlab='', cex = 1, cex.axis = 1.25)
+            chrlabs = chrNames, col = cols, ylab='', xlab='', cex = 1)
   abline(h = -log10(alpha / sum(!is.na(dat[, i]))), lty = 3, col = 'red')
   mtext(text = '-log10(p)', 2, line = 2.7, cex = 1)
-  legend('topleft', legend = bquote(bold(.(paste0(colnames(dat)[i], strategy, '    ')))), cex = 1.25, bg = 'gray90')
+  legend('topleft', legend = bquote(bold(.(paste0(colnames(dat)[i], strategy, '    ')))), cex = 1, bg = 'gray90')
 }
 
 ## ################################ ##
 ## Plot Manhattan single chromosome ##
 ## ################################ ##
 
-plotManhattan_chrom <- function(dat = NULL, chrom = NULL, gene = NULL, legend.pos = NULL) {
+plotManhattan_chrom <- function(dat = NULL, chrom = NULL, gene = NULL, legend.pos = NULL, col.density = 1, pch = 16) {
   # subset the dataframe with specific population and specific chromosome
-    data <- dat[dat$CHRHomoeo == chrom, c(1:4, grep(gene, colnames(dat), ignore.case = T))]
+    data <- dat[dat$CHRHomoeo == chrom, c(1:4, grep(paste(gene, collapse = '|'), colnames(dat), ignore.case = T))]
   # set up ylim.max limit
     ylim.max = min(apply(data[, -c(1:4)], 2, function(p) max(-log10(na.omit(p)))))
   # plot manhattan
-    manhattan(data, p = colnames(data)[5], suggestiveline = F, genomewideline = F, ylim = c(0, ylim.max + 15),
+    manhattan(data, p = colnames(data)[5], suggestiveline = F, genomewideline = F, ylim = c(0, ylim.max + 30),
               ylab='', xlab='', cex = 1, cex.axis = 1, xaxt = 'n')
     abline(h = -log10(alpha / nrow(data)), lty = 3, col = 'red')
     axis(side = 1, at = seq(0, 900, 100) * 10^6, labels = seq(0, 900, 100))
-    mtext(text = '-log10(p)', 2, line = 2.5, cex = 1.25)
-    mtext(text = paste0('Chromosome ', chrom, ' (Mb)'), side = 1, line = 2.5, cex = 1.25)
+    mtext(text = '-log10(p)', side = 2, line = 2.25, cex = 1.25)
+    mtext(text = paste0('Chromosome ', chrom, ' (Mb)'), side = 1, line = 2.25, cex = 1.25)
 
     for (i in 6:ncol(data)) {
-      points(data$BP, -log10(data[, i]), col = i-4, cex = 0.75, pch = 16)
+      points(data$BP, -log10(data[, i]), col = alpha(i-4, col.density), cex = 0.75, pch = pch)
     }
     
-    legend(legend.pos, legend = paste0(colnames(data)[-c(1:4)],'    '), 
-           pch = c(16), col = c(1,2,3,4), cex = 1)
+    legend(legend.pos, legend = paste0(colnames(data)[-c(1:4)]), pch = c(16), col = c(1:(ncol(data)-4)), cex = 1.25)
 }
 
 ## ############### ##
