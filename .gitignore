@@ -1,5 +1,6 @@
 data/
 output/
+other_files/
 log.txt
 
 *.Rproj*
