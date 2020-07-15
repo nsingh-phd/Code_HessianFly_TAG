@@ -5,4 +5,4 @@ log.txt
 *.Rproj*
 .Rhistory
 .RData
-.git*
+.git/
