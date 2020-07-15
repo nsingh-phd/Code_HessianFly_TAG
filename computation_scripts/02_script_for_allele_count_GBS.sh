@@ -1,10 +1,13 @@
 #!/bin/bash -l
 
-#SBATCH --job-name=HessianFly_TAG_AC
+###########################
+## Author: Narinder Singh
+###########################
 
-#SBATCH --mem-per-cpu=6G   					# Memory per core
+#SBATCH --job-name=HessianFly_TAG_AC
+#SBATCH --mem-per-cpu=6G
 #SBATCH --cpus-per-task=10
-#SBATCH --time=01-00:00:00   				# Use the form DD-HH:MM:SS
+#SBATCH --time=01-00:00:00
 #SBATCH --mail-type=ALL --output="%x_%j.o"
 
 # set memory and cores to use in downstream analysis (generally no need to change)

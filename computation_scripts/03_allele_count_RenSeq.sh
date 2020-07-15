@@ -1,4 +1,9 @@
 #!/bin/bash
+
+###########################
+## Author: Narinder Singh
+###########################
+
 export PATH=$PATH:/homes/usr/bin:/homes/usr/bin/bin
 
 #$ -l h_rt=72:00:00
