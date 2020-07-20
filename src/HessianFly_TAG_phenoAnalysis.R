@@ -1,14 +1,16 @@
-## ###########################
+## ##############################################
 ## Hessian Fly TAG Manuscript
 ## Author - Narinder Singh
-## Phenotype plots
-## ###########################
+## This script plot phenotype distribution plots
+## ##############################################
 
 ## load functions
   source('HessianFly_TAG_functions.R')
 
 ##
 ## Hessian fly screening in greenhouse
+## These values represent the counts of lines in each category
+## Values were counted from phenotypic screening in the greenhouse and hardcoded here for plotting
 ##
   pdf(file="output/Fig.1_phenotypic_distribution.pdf", width = 8.5, height = 11)
   par(mfrow=c(4,2))
