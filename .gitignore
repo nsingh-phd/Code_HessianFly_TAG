@@ -7,3 +7,4 @@ log.txt
 .Rhistory
 .RData
 .git/
+.DS_Store
