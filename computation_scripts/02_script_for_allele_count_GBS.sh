@@ -96,7 +96,7 @@ $tasselPath -Xms"${mem}"G -Xmx"${mem}"G -fork1 -GetTagTaxaDistFromDBPlugin \
 echo "10. GetTagTaxaDistFromDBPlugin: The exit code is $?" >> z_exitcode.log
 
 ## PERL script to get allele counts
-perl "${alleleCount}" "${name}".vcf > AlleleCounts.txt
+perl "${alleleCount}" "${name}".vcf > "${name}".vcf2AC.txt
 
 ## Get errors in one file
 grep -i "ERROR" z_pipeline.log >> z_ERROR.log

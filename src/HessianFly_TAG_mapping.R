@@ -155,7 +155,7 @@
 ## ########################## ##
 
 # read allele counts from GBS data
-  alleleCounts <- fread('data/AlleleCounts.txt', header = T, check.names = F, data.table = F)
+  alleleCounts <- fread('data/HessianFly_TAG_AC.vcf2AC.txt', header = T, check.names = F, data.table = F)
 
 # read allele counts from RenSeq Data
   alleleCounts_RenSeq_Tv2 <- fread('data/AC_RenSeq-Tv2.txt', header = T, check.names = F, data.table = F)
