@@ -41,3 +41,6 @@ bcftools call -c -v HFly_RenSeq_AC_Tv2_parts.bcf > HFly_RenSeq_AC_Tv2_parts.vcf
 # extracting allele count data
 perl /homes/scripts/vcf2AC_v2.pl HFly_RenSeq_AC_Tv2_parts.vcf > HFly_RenSeq_AC_Tv2_parts.txt
 
+# run Rscript to fix chromosome names and positions (This produces HFly_RenSeq_AC_Tv2.vcf2AC.txt file)
+Rscript 03_script-ToFixChromPos_RenSeq_AC_Tv2.R
+
