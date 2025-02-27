@@ -8,10 +8,10 @@
 ## ###########################
 
 # load required functions
-  source("HessianFly_TAG_functions.R")
+  source("src/HessianFly_TAG_functions.R")
   
 # read hapfile
-  hap.orig <- fread("data/HessianFly_TAG.hmp.txt", header = T, check.names = F, stringsAsFactors = F, data.table = F)
+  hap.orig <- fread("data/HFly_GBS_SNPs.hmp.txt", header = T, check.names = F, stringsAsFactors = F, data.table = F)
   # remove 'S' from SNP name and rename the col
     colnames(hap.orig)[1] <- 'rs'
     hap.orig$rs <- sub(pattern = '^S', replacement = '', hap.orig$rs)
@@ -155,10 +155,10 @@
 ## ########################## ##
 
 # read allele counts from GBS data
-  alleleCounts <- fread('data/HessianFly_TAG_AC.vcf2AC.txt', header = T, check.names = F, data.table = F)
+  alleleCounts <- fread('data/HFly_GBS_AC.vcf2AC.txt', header = T, check.names = F, data.table = F)
 
 # read allele counts from RenSeq Data
-  alleleCounts_RenSeq_Tv2 <- fread('data/AC_RenSeq-Tv2.txt', header = T, check.names = F, data.table = F)
+  alleleCounts_RenSeq_Tv2 <- fread('data/HFly_RenSeq_AC_Tv2.vcf2AC.txt', header = T, check.names = F, data.table = F)
 
 ##
 ## Assiciation tests

@@ -5,7 +5,7 @@
 ## ##############################################
 
 ## load functions
-  source('HessianFly_TAG_functions.R')
+  source('src/HessianFly_TAG_functions.R')
 
 ##
 ## Hessian fly screening in greenhouse
