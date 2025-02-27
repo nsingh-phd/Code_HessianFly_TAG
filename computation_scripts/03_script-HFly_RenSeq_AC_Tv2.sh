@@ -8,7 +8,7 @@ export PATH=$PATH:/homes/usr/bin:/homes/usr/bin/bin
 
 #$ -l h_rt=72:00:00
 #$ -l mem=15G
-#$ -N RenSeq_SNP_Call_Tv2
+#$ -N HFly_RenSeq_AC_Tv2_parts
 #$ -pe single 6
 #$ -cwd
 
@@ -31,13 +31,13 @@ mkdir variants
 
 # calling SNPs using samtools
 ls | grep "_rmdup.bam" > rmdup.bam.files
-samtools mpileup -IBg -b rmdup.bam.files -f $dbPath -t AD,DP,SP,ADF,ADR,DV -o variants/allSamples.bcf
+samtools mpileup -IBg -b rmdup.bam.files -f $dbPath -t AD,DP,SP,ADF,ADR,DV -o variants/HFly_RenSeq_AC_Tv2_parts.bcf
 
 cd variants
 
 # creating vcf file with potential SNP sites
-bcftools call -c -v allSamples.bcf > allSamples.vcf
+bcftools call -c -v HFly_RenSeq_AC_Tv2_parts.bcf > HFly_RenSeq_AC_Tv2_parts.vcf
 
 # extracting allele count data
-perl /homes/scripts/vcf2AC_v2.pl allSamples.vcf > AC.txt
+perl /homes/scripts/vcf2AC_v2.pl HFly_RenSeq_AC_Tv2_parts.vcf > HFly_RenSeq_AC_Tv2_parts.txt
 

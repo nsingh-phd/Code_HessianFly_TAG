@@ -4,7 +4,7 @@
 ## Author: Narinder Singh
 ###########################
 
-#SBATCH --job-name=HessianFly_TAG
+#SBATCH --job-name=HFly_GBS_SNPs
 #SBATCH --mem-per-cpu=6G
 #SBATCH --cpus-per-task=10
 #SBATCH --time=02-00:00:00
@@ -89,10 +89,10 @@ echo "8. ProductionSNPCallerPlugin: The exit code is $?" >> z_exitcode.log
 $tasselPath -Xms"${mem}"G -Xmx"${mem}"G -fork1 -vcf "${name}".vcf -export "${name}" -exportType Hapmap
 echo "9. HapmapConversion: The exit code is $?" >> z_exitcode.log
 
-## GetTagTaxaDistFromDBPlugin - get tags by taxa distribution
-$tasselPath -Xms"${mem}"G -Xmx"${mem}"G -fork1 -GetTagTaxaDistFromDBPlugin \
-	-db "${name}".db -o "${name}"_TagTaxaDist.txt -endPlugin -runfork1 >> z_pipeline.log
-echo "10. GetTagTaxaDistFromDBPlugin: The exit code is $?" >> z_exitcode.log
+# ## GetTagTaxaDistFromDBPlugin - get tags by taxa distribution
+# $tasselPath -Xms"${mem}"G -Xmx"${mem}"G -fork1 -GetTagTaxaDistFromDBPlugin \
+# 	-db "${name}".db -o "${name}"_TagTaxaDist.txt -endPlugin -runfork1 >> z_pipeline.log
+# echo "10. GetTagTaxaDistFromDBPlugin: The exit code is $?" >> z_exitcode.log
 
 ## Get errors in one file
 grep -i "ERROR" z_pipeline.log >> z_ERROR.log

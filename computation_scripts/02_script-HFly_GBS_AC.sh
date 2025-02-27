@@ -4,7 +4,7 @@
 ## Author: Narinder Singh
 ###########################
 
-#SBATCH --job-name=HessianFly_TAG_AC
+#SBATCH --job-name=HFly_GBS_AC
 #SBATCH --mem-per-cpu=6G
 #SBATCH --cpus-per-task=10
 #SBATCH --time=01-00:00:00
