@@ -49,7 +49,7 @@
   chisq.test(categData)
   spineplot(categData, xaxlabels = c('Rr', 'RR', 'rr'), 
             yaxlabels = c("'Overley'-like", 'Het', 'Ae. tauschii like'),
-            col = c('forestgreen', 'gray', 'green'), 
+            col = c("#FB8500","#FFB703","#023047"), 
             main = 'Color distribution within different genotypes')
   mtext(paste('Chi-sq p-val =', round(chisq.test(categData)$p.value, 3)), side = 3, cex = 1.25)
   
