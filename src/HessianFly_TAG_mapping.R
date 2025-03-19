@@ -299,11 +299,11 @@
     # plot manhattan
       manhattan(x = dat, ylim = c(0, ylim.max), suggestiveline = F, genomewideline = F,
                 chrlabs = chrNames, col = cols, xlab = '', ylab = '')
-      abline(h = -log10(mean(bon.thresh.bsa, bon.thresh.gbs)), lty = 3, col = 'red')
+      abline(h = -log10(mean(bon.thresh.bsa, bon.thresh.gbs)), lty = 3, col = 'darkgray')
       mtext(text = '-log10(p)', 2, line = 2.7, cex = 1)
       legend('topright', legend = bquote(bold(.(paste0(pop.gene.chrom$pop.code[i], '    ')))), cex = 1, bg = 'gray90')
       if (i == 1) (legend('topleft', legend = paste0(c('A', 'B', 'D'), ' sub-genome'), 
-                          pch = c(16), col = c('black', 'red', 'blue'), cex = 1.25))
+                          pch = c(16), col = c('#023047', '#8ECAE6', '#FB8500'), cex = 1.25))
     }
     dev.off()
 
