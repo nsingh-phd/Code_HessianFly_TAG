@@ -17,9 +17,9 @@
   
 ## assign chromosome colors
   chrNames <- sort(unique(chrom.info$chrom_simple))
-  cols <- rep('black', length(chrNames))
-  cols[grep('B', chrNames)] = 'red'
-  cols[grep('D', chrNames)] = 'blue'
+  cols <- rep('#023047', length(chrNames))
+  cols[grep('B', chrNames)] = '#8ECAE6'
+  cols[grep('D', chrNames)] = '#FB8500'
 
 ## ################################# ##
 ## function to parse out populations ##
@@ -163,9 +163,9 @@ associationTest_GBS <- function(dat = NULL, res.parent = NULL, sus.parent = NULL
     f.test <- droplevels(f.test)
     
     chrNames <- unique(f.test$CHRHomoeo)
-    cols <- rep('black', length(chrNames))
-    cols[grep('B', chrNames)] = 'red'
-    cols[grep('D', chrNames)] = 'blue'
+    cols <- rep('#023047', length(chrNames))
+    cols[grep('B', chrNames)] = '#8ECAE6'
+    cols[grep('D', chrNames)] = '#FB8500'
   
   # Bonferroni threshold
   cat('Bonferroni level:', alpha/nrow(f.test))
@@ -253,9 +253,9 @@ associationTest_BSA <- function(data = NULL, pop.id = NULL, gene = NULL, alpha =
         dev.off()
         
         chrNames <- unique(pVals$CHRHomoeo)
-        cols <- rep('black', length(chrNames))
-        cols[grep('B', chrNames)] = 'red'
-        cols[grep('D', chrNames)] = 'blue'
+        cols <- rep('#023047', length(chrNames))
+        cols[grep('B', chrNames)] = '#8ECAE6'
+        cols[grep('D', chrNames)] = '#FB8500'
         
         pdf(file = paste0('output/', gene, '.BSA.genomewide.pdf'), height = 6.5, width = 11)
         manhattan(pVals, suggestiveline = F, genomewideline = -log10(alpha / nrow(pVals)), 
@@ -314,7 +314,7 @@ plotManhattan <- function(dat = NULL, strategy = NULL) {
   manhattan(dat, p = colnames(dat)[i], suggestiveline = F, genomewideline = F,
             ylim = c(0, range(-log10(dat[, i]), na.rm = T)[2] + 2),
             chrlabs = chrNames, col = cols, ylab='', xlab='', cex = 1)
-  abline(h = -log10(alpha / sum(!is.na(dat[, i]))), lty = 3, col = 'red')
+  abline(h = -log10(alpha / sum(!is.na(dat[, i]))), lty = 3, col = 'darkgray')
   mtext(text = '-log10(p)', 2, line = 2.7, cex = 1)
   legend('topleft', legend = bquote(bold(.(paste0(colnames(dat)[i], strategy, '    ')))), cex = 1, bg = 'gray90')
 }
@@ -324,23 +324,25 @@ plotManhattan <- function(dat = NULL, strategy = NULL) {
 ## ################################ ##
 
 plotManhattan_chrom <- function(dat = NULL, chrom = NULL, gene = NULL, legend.pos = NULL, col.density = 1, pch = 16) {
+   # define colors
+   cols = c("#023047", "#8ECAE6", "#FFB703", "#219EBC", "#FB8500", "#ffafcc")
   # subset the dataframe with specific population and specific chromosome
     data <- dat[dat$CHRHomoeo == chrom, c(1:4, grep(paste(gene, collapse = '|'), colnames(dat), ignore.case = T))]
   # set up ylim.max limit
     ylim.max = min(apply(data[, -c(1:4)], 2, function(p) max(-log10(na.omit(p)))))
   # plot manhattan
     manhattan(data, p = colnames(data)[5], suggestiveline = F, genomewideline = F, ylim = c(0, ylim.max + 30),
-              ylab='', xlab='', cex = 1, cex.axis = 1, xaxt = 'n')
-    abline(h = -log10(alpha / nrow(data)), lty = 3, col = 'red')
+              ylab='', xlab='', cex = 1, cex.axis = 1, xaxt = 'n', col = cols[1])
+    abline(h = -log10(alpha / nrow(data)), lty = 3, col = 'darkgray')
     axis(side = 1, at = seq(0, 900, 100) * 10^6, labels = seq(0, 900, 100))
     mtext(text = '-log10(p)', side = 2, line = 2.25, cex = 1.25)
     mtext(text = paste0('Chromosome ', chrom, ' (Mb)'), side = 1, line = 2.25, cex = 1.25)
 
     for (i in 6:ncol(data)) {
-      points(data$BP, -log10(data[, i]), col = alpha(i-4, col.density), cex = 0.75, pch = pch)
+      points(data$BP, -log10(data[, i]), col = alpha(cols[i-4], col.density), cex = 0.75, pch = pch)
     }
     
-    legend(legend.pos, legend = paste0(colnames(data)[-c(1:4)]), pch = c(16), col = c(1:(ncol(data)-4)), cex = 1.25)
+    legend(legend.pos, legend = paste0(colnames(data)[-c(1:4)]), pch = c(16), col = cols, cex = 1.25)
 }
 
 ## ############### ##
@@ -380,17 +382,17 @@ phenoPlots <- function(values = NULL, name = NULL, alpha = 0.05, seg = NULL, tra
   if (seg == '1:2:1') (chiTest <- chisq.test(values, p = c(0.25, 0.5, 0.25)))
   if (seg == '1:1') (chiTest <- chisq.test(values[-2], p = c(0.5, 0.5)))
   midpoints <- barplot(values, plot = F)
-  if(trait == 'HF') {cols <- c("forestgreen","orange","tomato")
+  if(trait == 'HF') {cols <- c("#023047","#FFB703","#FB8500")
                      xlabs = c("RR", "Rr", "rr")}
-  if(trait == 'plant_color') {cols <- c('forestgreen', 'gray', 'green')
+  if(trait == 'plant_color') {cols <- c("#023047","#FFB703","#FB8500")
                               xlabs = c("'Overley'-like", 'Het', 'Ae. tauschii like')}
   barplot(values, col = cols, ylab = "", 
           cex.names = 1.5, cex.axis = 1.5, cex.lab = 1.5,
           main = name, ylim = c(0, max(values) + 10),
           cex.main = 2, names.arg = xlabs)
   mtext(text = "Number of lines", side = 2, line = 2.5)
-  if (seg == '1:2:1') text(midpoints, values - values/2, labels = values, cex = 1.5)
-  if (seg == '1:1') text(midpoints[-2], values[-2] - values[-2]/2, labels = values[-2], cex = 1.5)
+  if (seg == '1:2:1') text(midpoints, values - values/2, labels = values, cex = 1.5, col = c("white", "black", "black"))
+  if (seg == '1:1') text(midpoints[-2], values[-2] - values[-2]/2, labels = values[-2], cex = 1.5, col = c("white", "black"))
   
   p = round(chiTest$p.value, digits = 3)
   if (p > alpha) p2 = paste0('p = ', p)
