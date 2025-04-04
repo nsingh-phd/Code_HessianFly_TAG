@@ -8,3 +8,4 @@ log.txt
 .RData
 .git/
 .DS_Store
+.Rproj.user

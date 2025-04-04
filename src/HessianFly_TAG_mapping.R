@@ -106,8 +106,9 @@
 ## Manhattan plots in one file
 ##
   
+   # combine f.test tables
   # get list of data frames to merge
-  f.tests.GBS <- ls(pattern = 'f.test.GBS')
+  f.tests.GBS <- ls(pattern = 'f.test.GBS.+.don')
   # change P values colname to gene to aviod conflict
   for (i in 1:length(f.tests.GBS)) {
     dat <- get(f.tests.GBS[i])
@@ -115,17 +116,40 @@
     assign(paste0(f.tests.GBS[i]), dat, envir = .GlobalEnv)
   }
   # merge all data frames and order based on chromosome and SNP positions
-  f.tests.GBS.combined <- Reduce(f = function(dtf1, dtf2) merge(dtf1, dtf2, by = c('SNP', 'CHR', 'BP', 'CHRHomoeo'), all = T),
+  f.tests.GBS.combined <- Reduce(f = function(dtf1, dtf2) merge(dtf1, dtf2, by = c('SNP', 'CHR', 'BP', 'CHRHomoeo', 'tot', 'BPcum', 'color'), all = T),
                                  x = mget(f.tests.GBS))
-  f.tests.GBS.combined <- f.tests.GBS.combined[order(f.tests.GBS.combined$CHR, f.tests.GBS.combined$BP), ]
-  colnames(f.tests.GBS.combined)[-c(1:4)] <- sub(pattern = '$', replacement = '_GBS', colnames(f.tests.GBS.combined)[-c(1:4)])
-  # create a pdf file for plotting
+  f.tests.GBS.combined <- f.tests.GBS.combined[order(f.tests.GBS.combined$CHR, f.tests.GBS.combined$BPcum), ]
+  colnames(f.tests.GBS.combined) <- sub(pattern = '.don$', replacement = '_GBS', colnames(f.tests.GBS.combined))
+  
+  # combine adf tables
+  # get list of data frames to merge
+  adf.GBS <- ls(pattern = 'f.test.GBS.+.adf')
+  # change P values colname to gene to aviod conflict
+  for (i in 1:length(adf.GBS)) {
+     dat <- get(adf.GBS[i])
+     colnames(dat)[2] <- substring(text = adf.GBS[i], first = 12)
+     assign(paste0(adf.GBS[i]), dat, envir = .GlobalEnv)
+  }
+  # merge all data frames and order based on chromosome and SNP positions
+  adf.GBS.combined <- Reduce(f = function(dtf1, dtf2) merge(dtf1, dtf2, by = c('CHRHomoeo'), all = T),
+                                 x = mget(adf.GBS))
+  colnames(adf.GBS.combined) <- sub(pattern = '.adf$', replacement = '_GBS', colnames(adf.GBS.combined))  # create a pdf file for plotting
+  
   pdf('output/Fig.S2_GWAS_GBS.pdf', height = 11, width = 7)
   # create some padding around the plots
-  par(mfrow=c(7,1), oma = c(2, 4, 1, 1), mar = c(2.75, 0, 0, 0)) 
+  par(mfrow=c(7,1), oma = c(2, 0, 1, 1), mar = c(2.75, 5, 0, 0)) 
   # plot manhattan plot
-  for (i in 5:ncol(f.tests.GBS.combined)) {
-    plotManhattan(dat = f.tests.GBS.combined)
+  for (i in 8:ncol(f.tests.GBS.combined)) {
+    # plotManhattan(dat = f.tests.GBS.combined)
+     plot(f.tests.GBS.combined$BPcum, -log10(f.tests.GBS.combined[,i]), 
+          pch=16, col=f.tests.GBS.combined$color, frame.plot = F, xaxt='n',
+          xlab = "Chromosome", ylab = "-log10(p)", cex.lab=1.5, las=1)
+     axis(side = 1, at = adf.GBS.combined[,i-6], labels = adf.GBS.combined$CHRHomoeo, line = 0)
+     abline(h = -log10(alpha/(sum(f.tests.GBS.combined[,i]<1, na.rm = T))), 
+            lty = 3, col = 'darkgray')
+     legend('topleft', legend = bquote(bold(.(paste0(colnames(f.tests.GBS.combined)[i], '    ')))), cex = 1, bg = 'gray90')
+     if (i == 8) (legend('topright', legend = paste0(c('A', 'B', 'D'), ' sub-genome'),
+                         pch = c(16), col = c('#023047', '#8ECAE6', '#FB8500'), cex = 1.25))
   }
   dev.off()
   
@@ -198,9 +222,10 @@
 ##
 ## Manhattan plots in one file
 ##
-
-  # get list of data frames to merge
-    f.tests.BSA <- ls(pattern = 'f.test.BSA')
+    
+    # combine f.test tables
+    # get list of data frames to merge
+    f.tests.BSA <- ls(pattern = 'f.test.BSA.+.don')
   # change P values colname to gene to aviod conflict
     for (i in 1:length(f.tests.BSA)) {
       dat <- get(f.tests.BSA[i])
@@ -208,20 +233,44 @@
       assign(paste0(f.tests.BSA[i]), dat, envir = .GlobalEnv)
     }
   # merge all data frames and order based on chromosome and SNP positions
-    f.tests.BSA.combined <- Reduce(f = function(dtf1, dtf2) merge(dtf1, dtf2, by = c('SNP', 'CHR', 'BP', 'CHRHomoeo'), all = T),
-                                  x = mget(f.tests.BSA))
-    f.tests.BSA.combined <- f.tests.BSA.combined[order(f.tests.BSA.combined$CHR, f.tests.BSA.combined$BP), ]
-    colnames(f.tests.BSA.combined)[-c(1:4)] <- sub(pattern = '$', replacement = '_BSA-GBS', 
-                                                       colnames(f.tests.BSA.combined)[-c(1:4)])
+    f.tests.BSA.combined <- Reduce(f = function(dtf1, dtf2) merge(dtf1, dtf2, by = c('SNP', 'CHR', 'BP', 'CHRHomoeo', 'tot', 'BPcum', 'color'), all = T),
+                                   x = mget(f.tests.BSA))
+    f.tests.BSA.combined <- f.tests.BSA.combined[order(f.tests.BSA.combined$CHR, f.tests.BSA.combined$BPcum), ]
+    colnames(f.tests.BSA.combined) <- sub(pattern = '.don$', replacement = '_BSA-GBS', colnames(f.tests.BSA.combined))
     colnames(f.tests.BSA.combined) <- sub(pattern = '_RenSeq_BSA-GBS', replacement = '_BSA-RenSeq', colnames(f.tests.BSA.combined))
     f.tests.BSA.combined.no.renseq <- f.tests.BSA.combined[, grep('RenSeq', colnames(f.tests.BSA.combined), invert = T)]
+    
+    # combine adf tables
+    # get list of data frames to merge
+    adf.BSA <- ls(pattern = 'f.test.BSA.+.adf')
+    # change P values colname to gene to aviod conflict
+    for (i in 1:length(adf.BSA)) {
+       dat <- get(adf.BSA[i])
+       colnames(dat)[2] <- substring(text = adf.BSA[i], first = 12)
+       assign(paste0(adf.BSA[i]), dat, envir = .GlobalEnv)
+    }
+    # merge all data frames and order based on chromosome and SNP positions
+    adf.BSA.combined <- Reduce(f = function(dtf1, dtf2) merge(dtf1, dtf2, by = c('CHRHomoeo'), all = T),
+                               x = mget(adf.BSA))
+    colnames(adf.BSA.combined) <- sub(pattern = '.adf$', replacement = '_BSA-GBS', colnames(adf.BSA.combined))
+    adf.BSA.combined.no.renseq <- adf.BSA.combined[, grep('RenSeq', colnames(adf.BSA.combined), invert = T)]
+
   # create a pdf file to hold plots
     pdf('output/Fig.S3_GWAS_BSA.pdf', height = 11, width = 7)
     # create some padding around the plots
-    par(mfrow=c(7,1), oma = c(2, 4, 1, 1), mar = c(2.75, 0, 0, 0)) 
+    par(mfrow=c(7,1), oma = c(2, 0, 1, 1), mar = c(2.75, 5, 0, 0)) 
   # plot manhattan plot
-    for (i in 5:ncol(f.tests.BSA.combined.no.renseq)) {
-      plotManhattan(dat = f.tests.BSA.combined.no.renseq)
+    for (i in 8:ncol(f.tests.BSA.combined.no.renseq)) {
+       # plotManhattan(dat = f.tests.GBS.combined)
+       plot(f.tests.BSA.combined.no.renseq$BPcum, -log10(f.tests.BSA.combined.no.renseq[,i]), 
+            pch=16, col=f.tests.BSA.combined.no.renseq$color, frame.plot = F, xaxt='n',
+            xlab = "Chromosome", ylab = "-log10(p)", cex.lab=1.5)
+       axis(side = 1, at = adf.BSA.combined.no.renseq[,i-6], labels = adf.BSA.combined.no.renseq$CHRHomoeo, line = 0)
+       abline(h = -log10(alpha/(sum(f.tests.BSA.combined.no.renseq[,i]<1, na.rm = T))), 
+              lty = 3, col = 'darkgray')
+       legend('topleft', legend = bquote(bold(.(paste0(colnames(f.tests.BSA.combined.no.renseq)[i], '    ')))), cex = 1, bg = 'gray90')
+       if (i == 8) (legend('topright', legend = paste0(c('A', 'B', 'D'), ' sub-genome'),
+                           pch = c(16), col = c('#023047', '#8ECAE6', '#FB8500'), cex = 1.25))
     }
     dev.off()
 
@@ -230,42 +279,84 @@
 ## RenSeq manhattan plots
 ##
     # take renseq samples out in a separate data.frame
-    f.tests.BSA.renseq.only <- f.tests.BSA.combined[, c(1:4, grep('RenSeq', colnames(f.tests.BSA.combined)))]
+    f.tests.BSA.renseq <- f.tests.BSA.combined[, c(1:7, grep('RenSeq', colnames(f.tests.BSA.combined)))]
+    adf.BSA.renseq <- adf.BSA.combined[, c(1, grep('RenSeq', colnames(adf.BSA.combined)))]
     # update colnames
-    colnames(f.tests.BSA.renseq.only) <- sub(pattern = '_BSA-RenSeq', replacement = '', colnames(f.tests.BSA.renseq.only))
+    colnames(f.tests.BSA.renseq) <- sub(pattern = '_BSA-RenSeq', replacement = '', colnames(f.tests.BSA.renseq))
+    colnames(adf.BSA.renseq) <- sub(pattern = '_RenSeq_BSA-GBS', replacement = '', colnames(adf.BSA.renseq))
     # create a pdf file to hold plots
-    pdf('output/Fig.4_GWAS_RenSeq_H26.pdf', height = 6, width = 7)
+    pdf('output/Fig.4_GWAS_RenSeq_H26.pdf', height = 6, width = 8)
     # create some padding around the plots
-    par(mfrow=c(2,1), oma = c(2, 4, 1, 1), mar = c(2.75, 0, 0, 0)) 
+    par(mfrow=c(2,1), oma = c(2, 0, 1, 1), mar = c(2.75, 4, 0, 0)) 
     # plot manhattan plot
-    for (i in 5:ncol(f.tests.BSA.renseq.only)) {
-      plotManhattan(dat = f.tests.BSA.renseq.only)
+    for (i in 8:ncol(f.tests.BSA.renseq)) {
+      # plotManhattan(dat = f.tests.BSA.renseq)
+       plot(f.tests.BSA.renseq$BPcum, -log10(f.tests.BSA.renseq[,i]), 
+            pch=16, col=f.tests.BSA.renseq$color, frame.plot = F, xaxt='n',
+            xlab = "Chromosome", ylab = "-log10(p)", cex=0.75, las=1)
+       axis(side = 1, at = adf.BSA.renseq[,i-6], labels = adf.BSA.renseq$CHRHomoeo, line = 0, cex.axis=0.75)
+       abline(h = -log10(alpha/(sum(f.tests.BSA.renseq[,i]<1, na.rm = T))), 
+              lty = 3, col = 'darkgray')
+       legend('topright', legend = bquote(bold(.(paste0(colnames(f.tests.BSA.renseq)[i], '    ')))), cex = 1, bg = 'gray90')
+       if (i == 8) (legend('topleft', legend = paste0(c('A', 'B', 'D'), ' sub-genome'),
+                           pch = c(16), col = c('#023047', '#8ECAE6', '#FB8500'), cex = 1.25))
     }
     dev.off()
-    
-##################################### ##
-## AC and GBS manhattan plots stacked ##
-##################################### ##
-
-# combine f.tests.BSA.combined and f.tests.GBS.combined and order by chr and snp position
-  f.tests.combined <- merge(f.tests.GBS.combined, f.tests.BSA.combined, by = c('SNP', 'CHR', 'BP', 'CHRHomoeo'), all = T)
-  f.tests.combined <- f.tests.combined[order(f.tests.combined$CHR, f.tests.combined$BP), ]
-# sort chromosomes
-  f.tests.combined <- f.tests.combined[, c(1:4, order(colnames(f.tests.combined)[-c(1:4)]) + 4)]
-# create a pdf file to hold plots
-  pdf('output/GWAS_GBS_BSA_Combined.pdf', height = 11, width = 7)
-  # create some padding around the plots
-  par(mfrow=c(8,1), oma = c(2, 4, 1, 1), mar = c(2.75, 0, 0, 0)) 
-  # plot manhattan plot
-  for (i in 5:ncol(f.tests.combined)) {
-    plotManhattan(dat = f.tests.combined)
-  }
-  dev.off()  
-
 
 ## ###################################################### ##
 ## Combine both strategies and plot single manhattan plot ##
 ## ###################################################### ##
+  
+  # GBS
+  f.tests.GBS <- grep(pattern = ".don$|.adf$", 
+                      x = ls(pattern = 'f.test.GBS.'), 
+                      invert = T, value = T)
+  # change P values colname to gene to aviod conflict
+  for (i in 1:length(f.tests.GBS)) {
+     dat <- get(f.tests.GBS[i])
+     colnames(dat)[2] <- substring(text = f.tests.GBS[i], first = 12)
+     assign(paste0(f.tests.GBS[i]), dat, envir = .GlobalEnv)
+  }
+  # merge all data frames and order based on chromosome and SNP positions
+  f.tests.GBS.combined <- Reduce(f = function(dtf1, dtf2) merge(dtf1, dtf2, by = c('SNP', 'CHR', 'BP', 'CHRHomoeo'), all = T),
+                                 x = mget(f.tests.GBS))
+  f.tests.GBS.combined <- f.tests.GBS.combined[order(f.tests.GBS.combined$CHR, f.tests.GBS.combined$BP), ]
+  colnames(f.tests.GBS.combined)[-c(1:4)] <- sub(pattern = '$', replacement = '_GBS', colnames(f.tests.GBS.combined)[-c(1:4)])
+  
+  # AC
+  f.tests.BSA <- grep(pattern = ".don$|.adf$", 
+                      x = ls(pattern = 'f.test.BSA.'), 
+                      invert = T, value = T)
+  # change P values colname to gene to aviod conflict
+  for (i in 1:length(f.tests.BSA)) {
+     dat <- get(f.tests.BSA[i])
+     colnames(dat)[2] <- substring(text = f.tests.BSA[i], first = 12)
+     assign(paste0(f.tests.BSA[i]), dat, envir = .GlobalEnv)
+  }
+  # merge all data frames and order based on chromosome and SNP positions
+  f.tests.BSA.combined <- Reduce(f = function(dtf1, dtf2) merge(dtf1, dtf2, by = c('SNP', 'CHR', 'BP', 'CHRHomoeo'), all = T),
+                                 x = mget(f.tests.BSA))
+  f.tests.BSA.combined <- f.tests.BSA.combined[order(f.tests.BSA.combined$CHR, f.tests.BSA.combined$BP), ]
+  colnames(f.tests.BSA.combined)[-c(1:4)] <- sub(pattern = '$', replacement = '_BSA-GBS', colnames(f.tests.BSA.combined)[-c(1:4)])
+  colnames(f.tests.BSA.combined) <- sub(pattern = '_RenSeq_BSA-GBS', replacement = '_BSA-RenSeq', colnames(f.tests.BSA.combined))
+
+  ## AC and GBS combined ##
+  # combine f.tests.BSA.combined and f.tests.GBS.combined and order by chr and snp position
+  f.tests.combined <- merge(f.tests.GBS.combined, f.tests.BSA.combined, 
+                            by = c('SNP', 'CHR', 'BP', 'CHRHomoeo'), 
+                            all = T)
+  f.tests.combined <- f.tests.combined[order(f.tests.combined$CHR, f.tests.combined$BP), ]
+  # sort chromosomes
+  f.tests.combined <- f.tests.combined[, c(1:4, order(colnames(f.tests.combined)[-c(1:4)]) + 4)]
+  # # create a pdf file to hold plots
+  #   pdf('output/GWAS_GBS_BSA_Combined.pdf', height = 11, width = 7)
+  #   # create some padding around the plots
+  #   par(mfrow=c(8,1), oma = c(2, 4, 1, 1), mar = c(2.75, 0, 0, 0)) 
+  #   # plot manhattan plot
+  #   for (i in 5:ncol(f.tests.combined)) {
+  #     plotManhattan(dat = f.tests.combined)
+  #   }
+  #   dev.off()  
   
   bsa.gbs.only <- f.tests.combined[, grep('renseq', colnames(f.tests.combined), ignore.case = T, invert = T)]
   pop.gene.chrom <- data.frame('pop.code' = c('H5-EN', 'H6-FN', 'H12-LN', 'H13-MN', 'H13-MO', 'H26-Fam1', 'H32-SynOpDH'),
@@ -277,17 +368,20 @@
   # pdf file
     pdf('output/Fig.2_GWAS_SigSNPs.pdf', height = 11, width = 7)
   # create some padding around the plots
-    par(mfrow=c(7,1), oma = c(2, 4, 1, 1), mar = c(2.75, 0, 0, 0)) 
+    par(mfrow=c(7,1), oma = c(2, 0, 1, 1), mar = c(2.75, 5, 0, 0)) 
   # plot manhattan
     for (i in 1:nrow(pop.gene.chrom)) {
     # data frame for specific population columns
       dat <- bsa.gbs.only[, c(1:4, grep(pop.gene.chrom$pop.code[i], colnames(bsa.gbs.only), ignore.case = T))]
     # bonf threshold for each strategy 
-      bon.thresh.gbs = alpha / nrow(get(paste0('f.test.GBS.', pop.gene.chrom$pop.code[i])))
-      bon.thresh.bsa = alpha / nrow(get(paste0('f.test.BSA.', pop.gene.chrom$pop.code[i])))
+      n_snps <- sum(dat[,6] < 1, na.rm = T); n_snps
+      bon.thresh.gbs = alpha / n_snps
+      n_snps <- sum(dat[,5] < 1, na.rm = T); n_snps
+      bon.thresh.bsa = alpha / n_snps
     # keep only those snps that are significant in both
       sig.in.both <- (dat[, grep('_BSA-GBS', colnames(dat))] <= bon.thresh.bsa) & 
                      (dat[, grep('_GBS', colnames(dat))] <= bon.thresh.gbs)
+      sum(sig.in.both, na.rm = T)
     # get the mean of pvals from both strategies
       dat$P = rowMeans(dat[, -c(1:4)])
     # replace non-significant snps to NA
@@ -295,14 +389,40 @@
     # append dat to bsa.gbs.combined.p
       bsa.gbs.combined.p[, i+4] <- dat$P
     # set up ylim.max limit
-      ylim.max = max(-log10(na.omit(dat$P))) + 3
+      ylim.max = max(-log10(na.omit(dat$P))) + 5; ylim.max
+    # calculate cumulative BP and axis
+      dat <- dat %>% 
+         group_by(CHR) %>% 
+         summarise(chr_len=as.numeric(max(BP))) %>%
+         mutate(tot=cumsum(chr_len)-chr_len) %>%
+         left_join(dat, ., by=c("CHR"="CHR")) %>%
+         arrange(CHR, BP) %>%
+         mutate( BPcum=BP+tot) %>% 
+         mutate(color = case_when(
+            str_detect(CHRHomoeo, 'A') ~ "#023047",
+            str_detect(CHRHomoeo, 'B') ~ "#8ECAE6",
+            .default = "#FB8500"
+         )) %>% 
+         select(-c(chr_len, tot))
+      
+      axisdf = dat %>%
+         group_by(CHRHomoeo) %>%
+         summarize(center=( max(BPcum) + min(BPcum) ) / 2)
+
     # plot manhattan
-      manhattan(x = dat, ylim = c(0, ylim.max), suggestiveline = F, genomewideline = F,
-                chrlabs = chrNames, col = cols, xlab = '', ylab = '')
-      abline(h = -log10(mean(bon.thresh.bsa, bon.thresh.gbs)), lty = 3, col = 'darkgray')
-      mtext(text = '-log10(p)', 2, line = 2.7, cex = 1)
+      # manhattan(x = dat, ylim = c(0, ylim.max), suggestiveline = F, genomewideline = F,
+      #           chrlabs = chrNames, col = cols, xlab = '', ylab = '')
+      # abline(h = -log10(mean(bon.thresh.bsa, bon.thresh.gbs)), lty = 3, col = 'darkgray')
+      # mtext(text = '-log10(p)', 2, line = 2.7, cex = 1)
+      
+      plot(dat$BPcum, -log10(dat$P), 
+           pch=16, col=dat$color, frame.plot = F, xaxt='n',
+           ylab = "-log10(p)", cex=0.75, cex.lab=1.5, las=1)
+      axis(side = 1, at = axisdf$center, labels = axisdf$CHRHomoeo, line = 0)
+      abline(h = -log10(mean(bon.thresh.bsa, bon.thresh.gbs)), 
+             lty = 3, col = 'darkgray')
       legend('topright', legend = bquote(bold(.(paste0(pop.gene.chrom$pop.code[i], '    ')))), cex = 1, bg = 'gray90')
-      if (i == 1) (legend('topleft', legend = paste0(c('A', 'B', 'D'), ' sub-genome'), 
+      if (i == 1) (legend('topleft', legend = paste0(c('A', 'B', 'D'), ' sub-genome'),
                           pch = c(16), col = c('#023047', '#8ECAE6', '#FB8500'), cex = 1.25))
     }
     dev.off()

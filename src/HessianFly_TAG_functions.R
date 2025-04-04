@@ -116,10 +116,11 @@ associationTest_GBS <- function(dat = NULL, res.parent = NULL, sus.parent = NULL
     geno[,1][res.parent.index] = 100
     geno[,1][sus.parent.index] = 0
     # remove snps where res and susceptible parents have same allele or missing data
-    geno <- geno[, geno[res.parent.index,] != geno[sus.parent.index,]]
-    geno <- geno[, !(is.na(geno[res.parent.index,]) | is.na(geno[sus.parent.index,]))]
-    geno <- geno[, !(geno[res.parent.index,] == 'H' | geno[sus.parent.index,] == 'H')]
-    cat('Biallelic SNPs after parental filtering =', ncol(geno) - 1)
+    geno2 = geno
+    geno2 <- geno2[, geno2[res.parent.index,] != geno2[sus.parent.index,]]
+    geno2 <- geno2[, !(is.na(geno2[res.parent.index,]) | is.na(geno2[sus.parent.index,]))]
+    geno2 <- geno2[, !(geno2[res.parent.index,] == 'H' | geno2[sus.parent.index,] == 'H')]
+    cat('Biallelic SNPs after parental filtering =', ncol(geno2) - 1)
     cat('\n')
     # compute and remove if full row is missing
     sumNA <- rowSums(is.na(geno[, 2:ncol(geno)]))
@@ -177,22 +178,63 @@ associationTest_GBS <- function(dat = NULL, res.parent = NULL, sus.parent = NULL
   cat('Number of significant SNPs:', sum(f.test$P < alpha/nrow(f.test)))
   cat('\n')
   
+  # set pvals=1 for SNPs where res and susceptible parents have same allele or missing data
+  f.test$P[! f.test$SNP %in% colnames(geno2)] = 1
+  
   ## plot
   pdf(file = paste0('output/', pop.id, '.GBS.QQ.Plot.pdf'), height = 6.5, width = 11)
   qq(f.test$P)
   dev.off()
   
+  # pdf(file = paste0('output/', pop.id, '.GBS.genomewide.pdf'), height = 6.5, width = 11)
+  # manhattan(f.test, suggestiveline = F, genomewideline = -log10(alpha/nrow(f.test)),
+  #           chrlabs = chrNames, col = cols, ylab='', xlab='', cex.axis=0.75)
+  # mtext('Chromosome', 1, line = 2.8, cex = 1.5)
+  # mtext('-log10(p)', 2, line = 2.7, cex = 1.5)
+  
+  ##############################
+
+  don <- f.test %>% 
+     
+     # Compute chromosome size
+     group_by(CHR) %>% 
+     summarise(chr_len=as.numeric(max(BP))) %>% 
+     
+     # Calculate cumulative position of each chromosome
+     mutate(tot=cumsum(chr_len)-chr_len) %>%
+     select(-chr_len) %>%
+     
+     # Add this info to the initial dataset
+     left_join(f.test, ., by=c("CHR"="CHR")) %>%
+     
+     # Add a cumulative position of each SNP
+     arrange(CHR, BP) %>%
+     mutate( BPcum=BP+tot) %>% 
+     mutate(color = case_when(
+        str_detect(CHRHomoeo, 'A') ~ "#023047",
+        str_detect(CHRHomoeo, 'B') ~ "#8ECAE6",
+        .default = "#FB8500"
+     ))
+  
+  axisdf = don %>%
+     group_by(CHRHomoeo) %>%
+     summarize(center=( max(BPcum) + min(BPcum) ) / 2)
+  
   pdf(file = paste0('output/', pop.id, '.GBS.genomewide.pdf'), height = 6.5, width = 11)
-  manhattan(f.test, suggestiveline = F, genomewideline = -log10(alpha/nrow(f.test)), 
-            chrlabs = chrNames, col = cols, ylab='', xlab='')
-  mtext('Chromosome', 1, line = 2.8, cex = 1.5)
-  mtext('-log10(p)', 2, line = 2.7, cex = 1.5)
+  plot(don$BPcum, -log10(don$P), 
+       pch=16, col=don$color, frame.plot = F, xaxt='n',
+       xlab = "Chromosome", ylab = "-log10(p)", cex.lab=1.5, las=1)
+  axis(side = 1, at = axisdf$center, labels = axisdf$CHRHomoeo, line = -0.75)
+  abline(h = -log10(alpha/(ncol(geno2)-1)), lty = 3, col = 'darkgray')
+  
+  ###########################
   
   dev.off()
   
   # assign f.test to a new object for output
   assign(paste0('f.test.GBS.', pop.id), f.test, envir = .GlobalEnv)
-  
+  assign(paste0('f.test.GBS.', pop.id, '.don'), don, envir = .GlobalEnv)
+  assign(paste0('f.test.GBS.', pop.id, '.adf'), axisdf, envir = .GlobalEnv)
 }
 
 
@@ -234,7 +276,11 @@ associationTest_BSA <- function(data = NULL, pop.id = NULL, gene = NULL, alpha =
       }
       # convert to data frame and remove snps with no pvalue
         pVals <- as.data.frame(pVals, stringsAsFactors = F)
-        pVals <- pVals[complete.cases(pVals), ]; cat('# Filtered SNPs:', nrow(pVals)); cat('\n')
+        n_snps <- sum(!is.na(pVals$P))
+        cat('# Filtered SNPs:', n_snps); cat('\n')
+        pVals$P[is.na(pVals$P)] = 1
+        # pVals <- pVals[complete.cases(pVals), ]; cat('# Filtered SNPs:', nrow(pVals))
+        cat('\n')
       # change chrom from text to numeric
         pVals$CHRHomoeo <- pVals$CHR
           for (i in 1:7) {
@@ -257,16 +303,54 @@ associationTest_BSA <- function(data = NULL, pop.id = NULL, gene = NULL, alpha =
         cols[grep('B', chrNames)] = '#8ECAE6'
         cols[grep('D', chrNames)] = '#FB8500'
         
+        # pdf(file = paste0('output/', gene, '.BSA.genomewide.pdf'), height = 6.5, width = 11)
+        # manhattan(pVals, suggestiveline = F, genomewideline = -log10(alpha / n_snps), 
+        #           chrlabs = chrNames, col = cols, ylab='', xlab='')
+        # mtext('Chromosome', 1, line = 2.8, cex = 1.5)
+        # mtext('-log10(p)', 2, line = 2.7, cex = 1.5)
+        
+        ###################################
+        don <- pVals %>% 
+           
+           # Compute chromosome size
+           group_by(CHR) %>% 
+           summarise(chr_len=as.numeric(max(BP))) %>% 
+           
+           # Calculate cumulative position of each chromosome
+           mutate(tot=cumsum(chr_len)-chr_len) %>%
+           select(-chr_len) %>%
+           
+           # Add this info to the initial dataset
+           left_join(pVals, ., by=c("CHR"="CHR")) %>%
+           
+           # Add a cumulative position of each SNP
+           arrange(CHR, BP) %>%
+           mutate( BPcum=BP+tot) %>% 
+           mutate(color = case_when(
+              str_detect(CHRHomoeo, 'A') ~ "#023047",
+              str_detect(CHRHomoeo, 'B') ~ "#8ECAE6",
+              .default = "#FB8500"
+           ))
+        
+        axisdf = don %>%
+           group_by(CHRHomoeo) %>%
+           summarize(center=( max(BPcum) + min(BPcum) ) / 2)
+        
         pdf(file = paste0('output/', gene, '.BSA.genomewide.pdf'), height = 6.5, width = 11)
-        manhattan(pVals, suggestiveline = F, genomewideline = -log10(alpha / nrow(pVals)), 
-                  chrlabs = chrNames, col = cols, ylab='', xlab='')
-        mtext('Chromosome', 1, line = 2.8, cex = 1.5)
-        mtext('-log10(p)', 2, line = 2.7, cex = 1.5)
+        plot(don$BPcum, -log10(don$P), 
+             pch=16, col=don$color, frame.plot = F, xaxt='n',
+             xlab = "Chromosome", ylab = "-log10(p)", cex.lab=1.5, las=1)
+        axis(side = 1, at = axisdf$center, labels = axisdf$CHRHomoeo, line = -0.75)
+        abline(h = -log10(alpha/n_snps), lty = 3, col = 'darkgray')
+        
+        ###################################
         
         dev.off()
         
       # assign pvalue dataframe to global variable
         assign(paste0('f.test.BSA.', gene), pVals, envir = .GlobalEnv)
+        assign(paste0('f.test.BSA.', gene, '.don'), don, envir = .GlobalEnv)
+        assign(paste0('f.test.BSA.', gene, '.adf'), axisdf, envir = .GlobalEnv)
 }
 
 ## ###################### ##
@@ -310,14 +394,14 @@ est.introgression <- function(pop.code = NULL, chrom = NULL, strategy = NULL, al
 ## Plot Manhattan ##
 ## ############## ##
 
-plotManhattan <- function(dat = NULL, strategy = NULL) {
-  manhattan(dat, p = colnames(dat)[i], suggestiveline = F, genomewideline = F,
-            ylim = c(0, range(-log10(dat[, i]), na.rm = T)[2] + 2),
-            chrlabs = chrNames, col = cols, ylab='', xlab='', cex = 1)
-  abline(h = -log10(alpha / sum(!is.na(dat[, i]))), lty = 3, col = 'darkgray')
-  mtext(text = '-log10(p)', 2, line = 2.7, cex = 1)
-  legend('topleft', legend = bquote(bold(.(paste0(colnames(dat)[i], strategy, '    ')))), cex = 1, bg = 'gray90')
-}
+# plotManhattan <- function(dat = NULL, strategy = NULL) {
+#   manhattan(dat, p = colnames(dat)[i], suggestiveline = F, genomewideline = F,
+#             ylim = c(0, range(-log10(dat[, i]), na.rm = T)[2] + 2),
+#             chrlabs = chrNames, col = cols, ylab='', xlab='', cex = 1, cex.lab=0.75)
+#   abline(h = -log10(alpha / sum(!is.na(dat[, i]))), lty = 3, col = 'darkgray')
+#   mtext(text = '-log10(p)', 2, line = 2.7, cex = 1)
+#   legend('topleft', legend = bquote(bold(.(paste0(colnames(dat)[i], strategy, '    ')))), cex = 1, bg = 'gray90')
+# }
 
 ## ################################ ##
 ## Plot Manhattan single chromosome ##
