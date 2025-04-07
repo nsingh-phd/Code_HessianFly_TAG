@@ -2,6 +2,7 @@ data/
 output/
 other_files/
 log.txt
+HFly_mapping_code_and_data.zip
 
 *.Rproj*
 .Rhistory
